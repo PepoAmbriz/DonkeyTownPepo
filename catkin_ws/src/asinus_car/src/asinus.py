@@ -1,38 +1,19 @@
-import smbus 
+#import smbus 
 import struct
+import pylibi2c
+
 
 class AsinusMotors: 
-	def __init__(self,i2cbus=1,i2caddr=0x08):
-		self.i2c = smbus.SMBus(i2cbus)
-		self.addr = i2caddr
-	@staticmethod
-	def byte2float(bytes):
-		fdata = []	
-		for word in bytes:
-			bnum = ""
-			for b in word:
-				bnum = bnum+struct.pack("B",b)
-			fnum = struct.unpack("f",bnum) 
-			fdata.append(fnum)
-		return fdata
-	@staticmethod
-	def float2byte(fvals): 
-		blist = []
-		for fnum in fvals:
-			bvals = list(struct.pack('f',fnum))
-			for bnum in bvals: 
-				blist.append(int(bnum.encode('hex'),16))
-		return blist	
+	def __init__(self,i2cbus='/dev/i2c-1',i2caddr=0x08):
+		self.i2c = pylibi2c.I2CDevice(i2cbus, i2caddr)
+		self.addr = i2caddr	
 	def getMeasures(self): 
-		bdata = self.i2c.read_i2c_block_data(self.addr,0x00,12)
-		fdata = self.byte2float([bdata[0:4],bdata[4:8],bdata[8:12]]) 
+		bdata = self.i2c.ioctl_read(0x0,12)
+		fdata = struct.unpack('3f',bdata)
 		return fdata
 	def setSpeeds(self,vels):
-		print("Hello from setSpeeds")
-		print(vels)
-		blist = self.float2byte(vels)
-		print(blist)
-		self.i2c.write_i2c_block_data(self.addr,0x00,blist)
+		blist = bytes(struct.pack('ff',vels[0],vels[1]))
+		size = self.i2c.write(0x40044000,blist)
 	def stop(self):
 		self.setSpeeds([0.0,0.0])
 	def close(self): 
