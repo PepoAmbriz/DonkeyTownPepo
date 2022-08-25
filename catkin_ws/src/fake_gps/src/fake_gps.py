@@ -103,7 +103,7 @@ def main(args):
 	rospy.init_node('fakegps',anonymous=True)
 	cam_src = rospy.get_param("~cam_src", "internal") #Unique for each vehicle
 	ref_marks = marks_offset.keys()
-	node = fake_gps(2,camera_src=cam_src,refids=ref_marks)
+	node = fake_gps(0,camera_src=cam_src,refids=ref_marks) 
 	if not cam_src=='internal':	
 		try:
 			rospy.spin()
