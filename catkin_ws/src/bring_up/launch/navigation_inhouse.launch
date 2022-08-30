@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+  <remap from="/camera" to="/sensors/global_camera" />
+  <remap from="/sensors/global_camera/image_raw" to="/sensors/global_camera/image" />
+  <remap from="/sensors/global_camera/camera_info" to="/sensors/global_camera/info" />
+  
+  <env name="GAZEBO_MODEL_PATH" value="$(find autonomos_gazebo_simulation)/models:$(optenv GAZEBO_MODEL_PATH)"/>
+  <env name="GAZEBO_RESOURCE_PATH" value="$(find autonomos_gazebo_simulation)/worlds:$(optenv GAZEBO_RESOURCE_PATH)"/>
+
+  <arg name="gazebo_gui" default="true"/>
+  <arg name="pause" default = "false"/>
+  
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find simulator)/worlds/aruco.world"/>
+    <arg name="paused" value="$(arg pause)"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="$(arg gazebo_gui)"/>
+    <arg name="headless" value="false"/> 
+    <arg name="recording" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+
+  <node name="random_obstacles" pkg="bring_up" type="populated_test.py"/>
+
+  <node name="random_start" pkg="bring_up" type="test1_start.py"/>
+
+</launch>

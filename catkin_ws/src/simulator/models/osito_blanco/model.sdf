@@ -1,0 +1,46 @@
+
+<?xml version='1.0'?>
+<sdf version='1.5'>
+  <model name ="osito_blanco">
+
+    <link name='base_link'></link>
+
+    <link name="link">
+      <pose>0 0 0.07 0 0 0</pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.01</ixx>      
+          <ixy>0.0</ixy>        
+          <ixz>0.0</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0.0</iyz> 
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.1 0.05 0.14</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh> 
+            <uri> model://osito_blanco/meshes/blanco.dae </uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name='joint' type='fixed'>
+      <child>link</child>
+      <parent>base_link</parent>
+      <axis>
+          <xyz>0.000000 0.000000 1.000000</xyz>
+      </axis> 
+    </joint>
+    
+  </model>
+</sdf>

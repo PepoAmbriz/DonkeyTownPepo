@@ -1,0 +1,14 @@
+ 
+material Circuit/Mat
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture new_circuit_sf.png
+      }
+    }
+  }
+}

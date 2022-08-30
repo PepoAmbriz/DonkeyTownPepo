@@ -1,0 +1,41 @@
+<-- -->
+<launch>
+  <arg name="id"     default="0"/>
+  <arg name="x"     default="0.0"/>
+  <arg name="y"     default="0.0"/>
+  <arg name="yaw"   default="0.0"/>
+
+  <arg name="world_frame" default="world"/>
+  <arg name="map_frame"   default="map"/>
+  <arg name="odom_frame"  default="odom"/>
+
+<!--
+  <node
+    name="v$(arg id)_spawn_model"
+    pkg="gazebo_ros"
+    type="spawn_model"
+    args="-file $(find sim_v_2)/urdf/sim_v_2.urdf -urdf -model sim_ver2_v$(arg id)
+    -x $(arg x) -y $(arg y) -z 0.0 -Y $(arg yaw)"
+    output="screen" />
+  
+
+  <node name="v$(arg id)_static_tf_world_map" pkg="tf" type="static_transform_publisher"
+        args="0 0 0 0 0 0 $(arg world_frame) $(arg map_frame) 100"/>
+-->
+<param name="car$(arg id)_description"
+   command="$(find xacro)/xacro '$(find sim_v_2)/urdf/sim_v_2.urdf.xacro'
+   car_id:=$(arg id)" />
+
+<node
+  name="v$(arg id)_spawn_model"
+  pkg="gazebo_ros"
+  type="spawn_model"
+  args="-param car$(arg id)_description
+  -urdf -model sim_ver2_v$(arg id)
+  -x $(arg x) -y $(arg y) -z 0.0 -Y $(arg yaw)"
+  output="screen" />
+
+<node name="v$(arg id)_static_tf_world_map" pkg="tf" type="static_transform_publisher"
+  args="0 0 0 0 0 0 $(arg world_frame) $(arg map_frame) 100"/>
+
+</launch>

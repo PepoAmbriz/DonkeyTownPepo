@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!--define args to parse--> 
+  <arg name="world_name" default="empty"/>
+  <arg name="circuit_name" default="robotics_lab"/>
+  <arg name="gazebo_gui" default="true"/>
+  <arg name="pause" default = "false"/>
+
+  <!-- rename topics -->
+  <remap from="/camera" to="/sensors/global_camera" />
+  <remap from="/sensors/global_camera/image_raw" to="/sensors/global_camera/image" />
+  <remap from="/sensors/global_camera/camera_info" to="/sensors/global_camera/info" />
+  
+  <!-- Spawn the world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find simulator)/worlds/aruco.world"/>
+    <arg name="paused" value="$(arg pause)"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="$(arg gazebo_gui)"/>
+    <arg name="headless" value="false"/> 
+    <arg name="recording" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!--Spawn vehicles -->
+  <!-- Populate road -->
+
+  <include file="$(find sim_v_2)/launch/spawn_car.launch">
+    <arg name="id"    value="4"/>
+    <arg name="x"     value="1.0"/>
+    <arg name="y"     value="0.5"/>
+    <arg name="yaw"   value="1.0"/>
+  </include>
+
+  <!-- Populate road -->
+ 
+<!--
+  <include file="$(find sim_v_2)/launch/spawn_car.launch">
+    <arg name="id"    value="5"/>
+    <arg name="x"     value="-1.0"/>
+    <arg name="y"     value="0.5"/>
+    <arg name="yaw"   value="-1.0"/>
+  </include>
+-->
+
+  <!-- Populate road -->
+ 
+<!--
+  <include file="$(find sim_v_2)/launch/spawn_car.launch">
+    <arg name="id"    value="6"/>
+    <arg name="x"     value="1.0"/>
+    <arg name="y"     value="-0.5"/>
+    <arg name="yaw"   value="1.0"/>
+  </include>
+-->
+
+
+  <!-- Populate road -->
+<!--
+  <include file="$(find sim_v_2)/launch/spawn_car.launch">
+    <arg name="id"    value="7"/>
+    <arg name="x"     value="-1.0"/>
+    <arg name="y"     value="-0.5"/>
+    <arg name="yaw"   value="-1.0"/>
+  </include>
+-->
+
+</launch>
+
+
+
+
+
+  

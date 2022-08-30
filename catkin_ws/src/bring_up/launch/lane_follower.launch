@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="model"	default="AutoModelMini"/>
+  <arg name="lane"	default="1"/>
+  <arg name="speed"	default="0.3"/>
+
+  <node name="$(arg model)_odom" pkg="fub_navigation" type="auto_model_odom.py">
+  	<rosparam param="model" subst_value="True">$(arg model)</rosparam> 
+  </node>
+ 
+  <node name="$(arg model)_vf_ctrler" pkg="fub_navigation" type="control.py">
+  	<rosparam param="model" subst_value="True">$(arg model)</rosparam> 
+  	<rosparam param="lane" subst_value="True">$(arg lane)</rosparam> 
+  	<rosparam param="speed" subst_value="True">$(arg speed)</rosparam> 
+  </node>
+
+</launch>
