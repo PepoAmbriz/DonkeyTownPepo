@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle1"/>
+    <arg name="lane" value="2"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle2"/>
+    <arg name="lane" value="2"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle3"/>
+    <arg name="lane" value="2"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle4"/>
+    <arg name="lane" value="1"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle5"/>
+    <arg name="lane" value="2"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle6"/>
+    <arg name="lane" value="2"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle7"/>
+    <arg name="lane" value="1"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle8"/>
+    <arg name="lane" value="1"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle9"/>
+    <arg name="lane" value="1"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle10"/>
+    <arg name="lane" value="2"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle11"/>
+    <arg name="lane" value="1"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+  <include file="$(find bring_up)/launch/lane_follower.launch">
+    <arg name="model" value="AutoModel_Obstacle12"/>
+    <arg name="lane" value="2"/>
+    <arg name="speed" value="0.2"/>
+  </include>
+</launch>

@@ -1,0 +1,70 @@
+
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+        <uri>model://circuit</uri>
+        <name>circuit</name>
+        <pose>0.0 -0.00 0.001 0 0 1.5708</pose>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+        <uri>model://ros_camera</uri>
+        <name>camera1</name>
+        <pose> 0.0 0.0 2.4 0.0 1.5708 1.5708</pose>
+    </include>
+
+    <include>
+        <uri>model://aruco_visual_marker_0</uri>
+        <name>aruco_marker_0</name>
+        <pose>-0.5 -0.00 0.002 0 0 1.5708</pose>
+    </include>
+
+    <include>
+        <uri>model://aruco_visual_marker_1</uri>
+        <name>aruco_marker_1</name>
+        <pose>0.5 -0.00 0.002 0 0 1.5708</pose>
+    </include>
+
+
+    <include>
+      <uri>model://osito_blanco</uri>
+      <name>osito_blanco_1</name>
+      <pose>0 0.75 0 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://osito_cafe</uri>
+      <name>osito_cafe_1</name>
+      <pose>0 -0.75 0 0 0 0</pose>
+    </include>
+
+
+<!-- for refenrence only -->
+<!--
+    <population name="ball_population">
+      <model name="ball">
+        <include>
+          <static>true</static>
+          <uri>model://cricket_ball</uri>
+        </include>
+      </model>
+      <pose>0 0 -0.074 0 0 0</pose>
+        <distribution>
+            <type>grid</type>
+            <rows>20</rows>
+            <cols>20</cols>
+            <step>0.25 0.25 0</step>
+        </distribution>
+    </population>
+-->
+  </world>
+</sdf>
