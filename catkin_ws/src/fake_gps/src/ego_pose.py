@@ -26,7 +26,7 @@ class MarkCornersEstimator:
 		#Define a particle-knimeatic-based Kalman filter per square corner. 
 		self.mark_corners = np.zeros((4,2))
 		self.mark_corners_estimation = np.zeros((4,2))
-		self.corners_kf = [kalman.kinematic_kf(2,1) for i in range(4)] 
+		self.corners_kf = [kalman.kinematic_kf(2,1,dim_z=2) for i in range(4)] 
 		self.filters_init()
 		self.ltime = rospy.get_rostime()
 	def match_mark_corners(self,msgdata):
