@@ -3,9 +3,9 @@ import numpy as np
 h = 222
 w = 276 
 lw = 30
-a = 30
+a = 15
 b = 60
-c = 90 
+c = 90
 th = 1
 
 H = 400 
