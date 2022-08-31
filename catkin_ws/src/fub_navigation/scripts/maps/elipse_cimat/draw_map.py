@@ -1,12 +1,12 @@
 import cv2
 import numpy as np
-h = 239
-w = 299 
+h = 222
+w = 276 
 lw = 30
 a = 30
 b = 60
 c = 90 
-th = 2
+th = 1
 
 H = 400 
 W = 700
@@ -40,10 +40,11 @@ cv2.imshow('3 Channel Window', img_3)
 print("image shape: ", img_3.shape)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-#cv2.imwrite("circuit.png", img_3)
+cv2.imwrite("map.png", img_3)
 
 
 rf = 4
+th = 2
 img_3 = np.zeros([rf*H,rf*W,3],dtype=np.uint8)
 img_3.fill(0)
 img_3 = draw_contour(img_3,0*lw,a,yellow,rf)
@@ -54,5 +55,5 @@ cv2.imshow('3 Channel Window', img_3)
 print("image shape: ", img_3.shape)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-cv2.imwrite("circuit_sf.png", img_3)
-cv2.imwrite("circuit_sf.bmp", img_3)
+cv2.imwrite("map_sf.png", img_3)
+cv2.imwrite("map_sf.bmp", img_3)
