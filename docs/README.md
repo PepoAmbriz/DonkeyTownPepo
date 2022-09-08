@@ -36,6 +36,7 @@ All IDs are greater than 0.
  - [ ] Set all ips to static.
  - [x] (Troubleshooting) Document how to modify ssh login credentials.
  - [ ] Change all user_names and pswds to donkietown and elfmeter.
+ - [ ] Replace ros2_tf lookup_transform with custom_made code.
 
 ## Troubleshooting
 ### Setting static ip only for wlan
