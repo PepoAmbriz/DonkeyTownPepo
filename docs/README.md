@@ -7,9 +7,9 @@ DonkieTown consists of one or more differential-drive robots called Asinus cars,
 In CIMAT-ZAC we use a router with a wireless local area network to avoid changing network configuration and ros environment variables for each computer whenever we need to relocate. 
 
 SSID:
-| CIMAT_AUTOMINY
+> CIMAT_AUTOMINY
 Password:
-| CIMATZACATECAS
+> CIMATZACATECAS
 
 ## TODO
 ### Enabling fast wlan access configuration.
