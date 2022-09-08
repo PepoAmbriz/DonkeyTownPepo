@@ -6,24 +6,20 @@ DonkieTown consists of one or more differential-drive robots called Asinus cars,
 ## Fast configuration.
 In CIMAT-ZAC we use a router with a wireless local area network to avoid changing network configuration and ros environment variables for each computer whenever we need to relocate. 
 
-SSID:
-> CIMAT_AUTOMINY
-
-Password:
-> CIMATZACATECAS
-
-Gateway:
-> 192.168.100.1
+- SSID:
+   > CIMAT_AUTOMINY
+- Password:
+   > CIMATZACATECAS
+- Gateway:
+   > 192.168.100.1
 
 ### Agents static ips.
-Ground Station and ROS Master:
-> 192.168.100.100
-
-Upper cameras:
-> 192.168.100.[100+ID]
-
-Asinus cars:
-> 192.168.100.[100+CAR_ID]
+- Ground Station and ROS Master:
+   > 192.168.100.100
+- Upper cameras:
+   > 192.168.100.[100+ID]
+- Asinus cars:
+   > 192.168.100.[100+CAR_ID]
 
 All IDs are greater than 0.
 
