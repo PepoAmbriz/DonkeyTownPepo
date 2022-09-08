@@ -49,6 +49,7 @@ sudo apt-get install netplan
 ls /sys/class/net
 ```
 Take a note of this interface name (wlan0). We will use it in next steps. 
+
 3. Add netplan file from main branch of DonkieTown repo.
 ```
 sudo cp ./misc/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml
