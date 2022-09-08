@@ -43,7 +43,7 @@ All IDs are greater than 0.
 This procedure has been proved for asinus cars and ours upper cameras. 
 1. Install netplan.
 ```
-sudo apt-get install netplan
+sudo apt-get install netplan.io
 ```
 2. Identify your wireless network interface name.
 ```
