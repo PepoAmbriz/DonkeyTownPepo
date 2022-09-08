@@ -8,6 +8,7 @@ In CIMAT-ZAC we use a router with a wireless local area network to avoid changin
 
 SSID:
 > CIMAT_AUTOMINY
+
 Password:
 > CIMATZACATECAS
 
