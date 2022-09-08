@@ -12,6 +12,27 @@ SSID:
 Password:
 > CIMATZACATECAS
 
+Gateway:
+> 192.168.100.1
+
+### Agents static ips.
+Ground Station and ROS Master:
+> 192.168.100.100
+
+Upper cameras:
+> 192.168.100.[100+ID]
+
+Asinus cars:
+> 192.168.100.[100+CAR_ID]
+
+All IDs are greater than 0.
+
+### Agents SSH credentials.
+user_name:
+> donkietown
+password:
+> elfmeter
+
 ## TODO
 ### Enabling fast wlan access configuration.
  - [ ] Document wlan CIMAT_AUTOMINY. 
