@@ -32,13 +32,13 @@ All IDs are greater than 0.
 ## TODO
 ### Enabling fast wlan access configuration.
  - [x] Document wlan CIMAT_AUTOMINY. 
- - [ ] (Troubleshooting) Document how to enable netplan with wlan0 static ip. 
+ - [x] (Troubleshooting) Document how to enable netplan with wlan0 static ip. 
  - [ ] Set all ips to static.
- - [ ] (Troubleshooting) Document how to modify 
+ - [x] (Troubleshooting) Document how to modify ssh login credentials.
  - [ ] Change all user_names and pswds to donkietown and elfmeter.
 
-### Troubleshooting
-#### Setting static ip only for wlan
+## Troubleshooting
+### Setting static ip only for wlan
 This procedure has been proved for asinus cars and ours upper cameras. 
 1. Install netplan.
 ```
@@ -61,4 +61,35 @@ sudo netplan generate
 5. Apply the changes.
 ```
 sudo netplan apply
+```
+
+### Changing login credentials.
+Change the password is as easy as type:
+```
+passwd
+```
+However, changing username is not as easy (but you could set your crdentials since the first boot).
+1. Create a temp user.
+```
+sudo -s
+useradd -G sudo temp
+passwd temp
+shutdown -h now
+```
+2. Log back in as the new "temp" user and elevate "temp" privileges.
+```
+ssh temp@192.168.100...
+sudo -s
+```
+3. Now, change username of the main account.
+```
+usermod -l donkietown <previous_user_name>
+shutdown -h now
+```
+4. Log back in as the donkietown user and delete out the temp user.
+```
+ssh donkietown@192.168.100...
+sudo -s
+deluser temp
+rm -rf /home/temp
 ```
