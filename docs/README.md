@@ -28,10 +28,10 @@ Asinus cars:
 All IDs are greater than 0.
 
 ### Agents SSH credentials.
-user_name:
-> donkietown
-password:
-> elfmeter
+- user_name:
+   > donkietown
+- password:
+   > elfmeter
 
 ## TODO
 ### Enabling fast wlan access configuration.
