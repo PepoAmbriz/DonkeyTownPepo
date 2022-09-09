@@ -3,7 +3,7 @@
 
 DonkieTown consists of one or more differential-drive robots called Asinus cars, a ground station, a localization system and a series of trusted techniques that easily allow the development of testbeds to implement and validate different strategies for collaborative autonomous driving, and study a variety of cases of study.
 
-![DonkieTown status](/docs/images/Donkietown.jpg)
+![DonkieTown status](/docs/images/DonkieTown.jpg)
 
 ## Fast configuration.
 In CIMAT-ZAC we use a router with a wireless local area network to avoid changing network configuration and ros environment variables for each computer whenever we need to relocate. 
