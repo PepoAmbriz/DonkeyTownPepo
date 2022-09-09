@@ -3,6 +3,8 @@
 
 DonkieTown consists of one or more differential-drive robots called Asinus cars, a ground station, a localization system and a series of trusted techniques that easily allow the development of testbeds to implement and validate different strategies for collaborative autonomous driving, and study a variety of cases of study.
 
+![DonkieTown status](/docs/images/Donkietown.jpg)
+
 ## Fast configuration.
 In CIMAT-ZAC we use a router with a wireless local area network to avoid changing network configuration and ros environment variables for each computer whenever we need to relocate. 
 
@@ -23,23 +25,28 @@ In CIMAT-ZAC we use a router with a wireless local area network to avoid changin
 
 All IDs are greater than 0.
 
+Please properly edit $DT_IP with the right ID in DonkiwTown's setup.bash file:
+```
+export DT_IP=[ID]
+```
+And don't forget to source that file.
+
+
 ### Agents SSH credentials.
 - user_name:
    > donkietown
 - password:
    > elfmeter
 
-## TODO
-### Enabling fast wlan access configuration.
- - [x] Document wlan CIMAT_AUTOMINY. 
- - [x] (Troubleshooting) Document how to enable netplan with wlan0 static ip. 
- - [ ] Set all ips to static.
- - [x] (Troubleshooting) Document how to modify ssh login credentials.
- - [ ] Change all user_names and pswds to donkietown and elfmeter.
- - [ ] Replace ros2_tf lookup_transform with custom_made code.
+# Simulator
+Multiple simulation scenarios are provided in the bring_up package.
+You can launch one scenario, e.g. in-house, with the following command.
+```
+roslaunch bring_up navigation_inhouse.launch
+```
 
-## Troubleshooting
-### Setting static ip only for wlan
+# Troubleshooting
+## Setting static ip only for wlan
 This procedure has been proved for asinus cars and ours upper cameras. 
 1. Install netplan.
 ```
@@ -94,3 +101,12 @@ sudo -s
 deluser temp
 rm -rf /home/temp
 ```
+
+# TODO
+## Enabling fast wlan access configuration.
+ - [x] Document wlan CIMAT_AUTOMINY. 
+ - [x] (Troubleshooting) Document how to enable netplan with wlan0 static ip. 
+ - [ ] Set all ips to static.
+ - [x] (Troubleshooting) Document how to modify ssh login credentials.
+ - [ ] Change all user_names and pswds to donkietown and elfmeter.
+ - [ ] Replace ros2_tf lookup_transform with custom_made code.
