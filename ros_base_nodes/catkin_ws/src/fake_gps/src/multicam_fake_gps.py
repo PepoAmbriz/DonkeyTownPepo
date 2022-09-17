@@ -87,8 +87,6 @@ class MobileMarker(Marker):
 
 class fake_gps: 
 	def __init__(self, cam=0, arucoDict=cv2.aruco.DICT_4X4_50, cam_id=0,camera_src='internal', refids={'0'}, markerLen=0.1, paramfile='calibration.yaml'): 
-		self.metrics = Performance("Transformations")
-
 		self.bridge = CvBridge() #When using rosbag as src image
 		self.arucoDict = cv2.aruco.Dictionary_get(arucoDict) 
 		self.markerLen = markerLen #square mark lenght 
