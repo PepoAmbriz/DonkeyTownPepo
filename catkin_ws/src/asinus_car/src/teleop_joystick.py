@@ -5,18 +5,19 @@ import roslib
 import rospy
 from sensor_msgs.msg import Joy
 from donkietown_msgs.msg import MotorsSpeed
-import numpy as np
 
 class JoyMotor():
     def __init__(self, rate, car_id):
         self.publisher = rospy.Publisher('/asinus_cars/'+str(car_id)+'/motors_driver', MotorsSpeed, queue_size = 1)
+        self.speedL = 0.0
+        self.speedR = 0.0
         rospy.Subscriber("joy", Joy, self.joy_callback)
         rospy.on_shutdown(self.shutdown)
         self.shutdown_ = False
     def publish(self,speedL,speedR):
         speed_msg = MotorsSpeed()
-        speed_msg.leftMotor = speedL
-        speed_msg.rightMotor = speedR
+        speed_msg.leftMotor = self.speedL
+        speed_msg.rightMotor = self.speedR
         self.publisher.publish(speed_msg)
     def stop(self):
         self.publish(0.0,0.0)
@@ -31,10 +32,8 @@ class JoyMotor():
         if rospy.is_shutdown():
             raise Exception("Got shutdown request before subscribers connected")
     def joy_callback(self,joy_data):
-        speedL = min(80*np.tanh(joy_data.axes[1]-joy_data.axes[0]),80)
-        speedR = min(80*np.tanh(joy_data.axes[1]+joy_data.axes[0]),80)
-        print("speedR: ",speedR)
-        print("speedL: ",speedL)
+        speedL = 50*joy_data.axes[1]
+        speedR = 50*joy_data.axes[0]
         if not self.shutdown_:
             self.publish(speedL,speedR)
     def shutdown(self):
