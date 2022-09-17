@@ -34,9 +34,22 @@ python setup.py install
    - [x] Change login credentials.
    - [x] Set static ip.
  - Second in progress:
-   - [ ] Replace 310-rpm motors with 155-rpm motors.
-   - [ ] Change login credentials.
-   - [ ] Set static ip.
+   - [x] Replace 310-rpm motors with 155-rpm motors.
+   - [x] Change login credentials.
+   - [x] Set static ip.
  - Third is TODO.
+   - [ ] Find h-bride
+   - [ ] Solder circuit board.
+   - [ ] Build wires.
 
 ## Troubleshooting
+- Project 'cv_bridge' can not find opencv
+
+In /opt/ros/melodic/share/cv_bridge/cmake/cv_bridgeConfig.cmake, replace this line:
+```
+set(_include_dirs "include;/usr/include;/usr/include/opencv")
+```
+to
+```
+set(_include_dirs "include;/usr/include;/usr/include/opencv4")
+```
