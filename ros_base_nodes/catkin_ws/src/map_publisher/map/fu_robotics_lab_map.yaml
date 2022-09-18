@@ -1,4 +1,4 @@
-image: elipse_map.bmp
+image: map.bmp
 resolution: 0.0025
 origin: [-3.5, -2.0, 0]
 occupied_thresh: 0.65
