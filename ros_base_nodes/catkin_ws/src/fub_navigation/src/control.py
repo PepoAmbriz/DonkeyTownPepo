@@ -39,31 +39,29 @@ class MapConfig(object):
         self.distance_lane_2 = np.load(path + 'matrix0cm_lane1.npy')
         #self.distance_lane_3 = np.load(path + 'matrix0cm_lane3.npy')        
         
-    
 class VectorfieldController(MapConfig):
-    def __init__(self,map_name):
-	rospy.init_node('VectorfieldController')
-        model = rospy.get_param('~model','AutoModelMini')
-        self.lane = rospy.get_param('~lane',1)
-        look_ahead = rospy.get_param('~look_ahead','25cm')
-	car_id = rospy.get_param('~car_id','11')
+    def __init__(self,map_name,lane,look_ahead,model_car,car_id,speed_value=0.3):
+        print(map_name,lane,look_ahead,model_car,car_id,speed_value)
+        self.lane = lane
         super(VectorfieldController,self).__init__(map_name,look_ahead)
-        #self.model_car = AutoModelMini([self.callback],model)
-        #callbacks = [self.callback,self.on_obs_detection] #Ackermann
-        callbacks = [self.ddr_callback,self.on_obs_detection] #ddr
-        
-        self.model_car = get_AutoModel(model,callbacks=callbacks,
+        if(model_car=='AutoModelMini'):    
+            self.Ks = [4.0,0.0,0.2]
+            self.last_var = [0.0]
+            callbacks = [self.callback,self.on_obs_detection] #ddr
+        else:
+            self.Ks = [0.4,0.4]
+            self.last_var = [0.0,0.0]
+            callbacks = [self.ddr_callback,self.on_obs_detection] #ddr
+
+        self.model_car = get_AutoModel(model_car,callbacks=callbacks,
 					fake_gps=True, car_id=car_id)
         
         self.x = 0.0
         self.y = 0.0 
 
         self.last_lane_change = rospy.Time.now()
-        self.speed_value = rospy.get_param('~speed',0.3)
-        #self.last_var = [0.0] #AutoMiny: Last angle
-        self.last_var = [0.0,0.0] #DDR. Last p*, last q*.
-        #self.Ks = [4.0,0.2,0.000] #PID for autominy
-        self.Ks = [0.4,0.4] #Kn1, kn2 for ddr
+        self.speed_value = speed_value
+        
         self.last_time = rospy.Time.now()
         self.integral_error = 0.0
         self.listener = tf.TransformListener()
@@ -75,7 +73,6 @@ class VectorfieldController(MapConfig):
         else:
             self.matrix = self.matrix_nlane_2
             self.rmatrix = self.matrix_lane_2
-
         rospy.on_shutdown(self.shutdown)
 
         self.shutdown_ = False
@@ -97,7 +94,7 @@ class VectorfieldController(MapConfig):
         #eccentric point ddr controller
         ps = delta_xd+self.x
         qs = delta_yd+self.y
-	print(ps, qs)
+        print(ps, qs)
         dps = (ps-self.last_var[0])/dt
         dqs = (qs-self.last_var[1])/dt
         self.last_var[0] = ps
@@ -131,7 +128,7 @@ class VectorfieldController(MapConfig):
         angle = np.arctan2(f_y, f_x)
 
         self.integral_error = self.integral_error + angle * dt
-        steering = self.Ks[0] * angle + self.Ks[1] * ((angle - self.last_var[0]) / dt) + self.Ks[2] * self.integral_error
+        steering = self.Ks[0] * angle + self.Ks[2] * ((angle - self.last_var[0]) / dt) + self.Ks[1] * self.integral_error
         self.last_var[0] = angle
 
         if f_x > 0:
@@ -263,9 +260,15 @@ def get_coords_from_vf(raw_x, raw_y, resolution, map_size_x, map_size_y, matrix)
     return (vx,vy)
 
 def main():
-    mname = 'inhouse'
+    rospy.init_node('VectorfieldController')
+    map_name = rospy.get_param("~map_name","new_indoors")
+    lane = int(rospy.get_param("~lane",'1'))
+    look_ahead = rospy.get_param("~look_ahead","25cm")
+    model_car = rospy.get_param("~model_car","AutoModelMini")
+    car_id = int(rospy.get_param("~car_id","7"))
     try:
-        VectorfieldController(map_name=mname)
+        VectorfieldController(map_name=map_name,lane=lane,look_ahead=look_ahead,
+                                model_car=model_car,car_id=car_id)
         rospy.spin()
     except rospy.ROSInterruptException:
         rospy.loginfo("VectorfieldController node terminated.")
