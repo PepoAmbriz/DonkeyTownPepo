@@ -27,6 +27,8 @@ class global_view:
 		self.image_pub = rospy.Publisher('/sensors/global_camera/image_raw', Image, queue_size=1)
 		self.bridge = CvBridge()
 		self.cam = cv2.VideoCapture(cam_port)
+		self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+		self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 	def talker(self):
 		rate = rospy.Rate(20) #fps
 		while not rospy.is_shutdown():
