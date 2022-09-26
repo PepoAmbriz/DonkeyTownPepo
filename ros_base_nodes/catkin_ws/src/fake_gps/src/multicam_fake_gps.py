@@ -16,6 +16,9 @@ from framework import axis_matrix
 from node_cfg import marks_offset
 from camera_misc import CameraModel
 from geometry_msgs.msg import PoseWithCovarianceStamped as PCS
+import threading
+import Queue as queue
+
 
 class Marker(object):
 	def __init__(self,mid,upcam_id,stamp,corners):
@@ -86,30 +89,43 @@ class MobileMarker(Marker):
 		self.posePub.publish(self.pose_msg) #Publish ego mark pose. 
 
 class fake_gps: 
-	def __init__(self, cam=0, arucoDict=cv2.aruco.DICT_4X4_50, cam_id=0,camera_src='internal', refids={'0'}, markerLen=0.1, paramfile='calibration.yaml'): 
+	def __init__(self, cam=0, arucoDict=cv2.aruco.DICT_4X4_50, cam_id=0,camera_src='internal', refids={'0'}, markerLen=0.1): 
 		self.bridge = CvBridge() #When using rosbag as src image
 		self.arucoDict = cv2.aruco.Dictionary_get(arucoDict) 
 		self.markerLen = markerLen #square mark lenght 
 		self.cam_id = cam_id #To allow multiple cameras running
 		self.refids = refids #Set of known reference markers' ids
+		self.frame_q = queue.Queue() #To share video frames into different threads 
 		self.time = rospy.Time.now()
 		self.tfBuffer = tf2_ros.Buffer() #This and the following are used for tf transformations
 		#self.listener = tf2_ros.TransformListener(self.tfBuffer) 
 			#This is recquired to import all TF transformations	
 			#tf broadcast will be only used for debugging purpopses
 		topic_bn = '/sensors/global_camera'
-		self.cam_model = CameraModel(paramfile=paramfile,topic=topic_bn+'/info')
+		calib_f = "cam_"+str(cam_id)+"_calibration.yaml"
+		self.cam_model = CameraModel(paramfile=calib_f,topic=topic_bn+'/info')
 		if camera_src == 'internal': 
 			self.cam = cv2.VideoCapture(cam)
+			self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+			self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 		else:
 			self.view_sub = rospy.Subscriber(topic_bn+'/image', Image, self.callback)
 			if camera_src == 'gazebo': 
 				del self.cam_model
 				self.cam_model = CameraModel(kind="subscriber",topic=topic_bn+'/info')
 	def talker(self):
+		proc_thread = threading.Thread(target=self.img_proc_threaded)
+		proc_thread.daemon = True
+		proc_thread.start()
 		while not rospy.is_shutdown():
 			foo,frame = self.cam.read()
+			self.frame_q.put(frame)
+
+	def img_proc_threaded(self):
+		while True:
+			frame = self.frame_q.get()
 			self.get_raw_poses(frame)
+
 	def callback(self,img): #Only executed alongside rosbag.
 		try: 
 			frame = self.bridge.imgmsg_to_cv2(img,'bgr8')
