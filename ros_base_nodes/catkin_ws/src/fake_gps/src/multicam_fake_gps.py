@@ -95,7 +95,7 @@ class fake_gps:
 		self.markerLen = markerLen #square mark lenght 
 		self.cam_id = cam_id #To allow multiple cameras running
 		self.refids = refids #Set of known reference markers' ids
-		self.frame_q = queue.Queue() #To share video frames into different threads 
+		self.frame_q = queue.Queue(maxsize=1) #To share video frames into different threads 
 		self.time = rospy.Time.now()
 		self.tfBuffer = tf2_ros.Buffer() #This and the following are used for tf transformations
 		#self.listener = tf2_ros.TransformListener(self.tfBuffer) 
@@ -119,7 +119,10 @@ class fake_gps:
 		proc_thread.start()
 		while not rospy.is_shutdown():
 			foo,frame = self.cam.read()
-			self.frame_q.put(frame)
+			try:
+				self.frame_q.put_nowait(frame)
+			except:
+				pass
 
 	def img_proc_threaded(self):
 		while True:
