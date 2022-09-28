@@ -102,7 +102,7 @@ class fake_gps:
 			#This is recquired to import all TF transformations	
 			#tf broadcast will be only used for debugging purpopses
 		topic_bn = '/sensors/global_camera'
-		calib_f = "cam_"+str(cam_id)+"_calibration.yaml"
+		calib_f = "calibration_files/cam_"+str(cam_id)+"_calibration_600p.yaml"
 		self.cam_model = CameraModel(paramfile=calib_f,topic=topic_bn+'/info')
 		if camera_src == 'internal': 
 			self.cam = cv2.VideoCapture(cam)
