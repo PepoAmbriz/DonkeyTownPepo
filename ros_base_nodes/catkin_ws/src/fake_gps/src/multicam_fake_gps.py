@@ -20,6 +20,7 @@ from geometry_msgs.msg import PoseWithCovarianceStamped as PCS
 import threading
 import Queue as queue
 
+
 class Marker(object):
 	def __init__(self,mid,upcam_id,stamp,corners):
 		self.mid = mid
@@ -36,7 +37,6 @@ class Marker(object):
 		self.frame.broadcast()
 	def set_relative_pose(self,rvec,tvec):
 		self.relH = axis_matrix(rvec,tvec)
-
 
 class MobileMarker(Marker):
 	def __init__(self,robot_id,upcam_id,stamp,corners):
@@ -95,10 +95,12 @@ class fake_gps:
 		self.markerLen = markerLen #square mark lenght 
 		self.cam_id = cam_id #To allow multiple cameras running
 		self.refids = refids #Set of known reference markers' ids
+		self.ref_marks = {}
 		self.frame_q = queue.Queue(maxsize=1) #To share video frames into different threads 
 		self.time = rospy.Time.now()
 		self.tf_enabled = enable_tf
-		self.tfBuffer = tf2_ros.Buffer() #This and the following are used for tf transformations
+		if enable_tf:
+			self.tfBuffer = tf2_ros.Buffer() #This and the following are used for tf transformations
 		#self.listener = tf2_ros.TransformListener(self.tfBuffer) 
 			#This is recquired to import all TF transformations	
 			#tf broadcast will be only used for debugging purpopses
@@ -152,8 +154,8 @@ class fake_gps:
 		markerArray.header.stamp = stamp
 
 		#Classify them as reference markers and mobile markers.
-		ref_marks = {}
 		mob_marks = {}
+		ref_marks = {}
 		for i in range(len(ids)):
 			marker_edges = MarkerEdge() #Creating markers msg item
 			marker_edges.id = ids[i]
@@ -180,16 +182,35 @@ class fake_gps:
 			#Pass if its a mobile marker.
 		self.markerCornersPub.publish(markerArray)
 		#FUTURE: Recolecting rejected squares.
+		#TODO: check current ref_markers sanity.
+		for test_rm in ref_marks:
+			test_rm_mid = test_rm.mid
+			if not test_rm_mid in self.ref_marks:
+				self.ref_marks[test_rm_mid] = test_rm
+				continue
+			for good_rm in self.ref_marks:
+				if test_rm_mid == good_rm.mid:
+					continue
+				h_test_to_good = np.matmul(np.linalg.inv(test_rm.relH),good_rm.relH)
+				(g_r,g_p,g_y) = euler_from_matrix(h_rm_to_good[0:3,0:3])
+				(t_xo,t_yo,t_tho) = marks_offset[str(test_rm.mid)]
+				(g_xo,g_yo,g_tho) = marks_offset[str(good_rm.mid)]
+				print("Relative distances from marker detection:")
+				pritn("x: ",g_xo-t_xo)
+				pritn("y: ",g_yo-t_yo)
+				print("th: ",g_tho-t_tho)
+				self.ref_marks[test_rm_mid] = test_rm
+
 		for mm in mob_marks.values():
 			#Find nearest reference marker
 			min_dist = 1E9
-			for rm in ref_marks.values():
+			for rm in self.ref_marks.values():
 				dist = np.sum(np.linalg.norm(np.asarray(mm.corners)-np.asarray(rm.corners)))
 				if dist < min_dist: 
 					min_dist = dist
 					near_rm = rm
 			if min_dist == 1E9:
-				return #No reference markers found, absolute pose cannob be calculated.
+				return #No reference markers found, absolute pose cannot be calculated.
 			#Publish position.
 			try:
 				#mm.update_posemsg_tf(near_rm.mid,self.tfBuffer.lookup_transform)
