@@ -178,6 +178,7 @@ class fake_gps:
 					marker.broadcast_tf(rvec,tvec)
 				mob_marks[id_dict] = marker
 			#Pass if its a mobile marker.
+		self.markerCornersPub.publish(markerArray)
 		#FUTURE: Recolecting rejected squares.
 		for mm in mob_marks.values():
 			#Find nearest reference marker
