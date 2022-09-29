@@ -5,20 +5,20 @@ import rospy
 import cv2
 import sys
 import yaml 
+import numpy as np
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-import numpy as np
+from camera_misc import CameraModel
+from donkietown_msgs.msg import MarkerEdge, MarkerEdgeArray, Square
 import tf
 import tf2_ros
 from tf.transformations import quaternion_from_euler, euler_from_quaternion, euler_from_matrix
 from framework import FrameBr as fw
 from framework import axis_matrix
 from node_cfg import marks_offset
-from camera_misc import CameraModel
 from geometry_msgs.msg import PoseWithCovarianceStamped as PCS
 import threading
 import Queue as queue
-
 
 class Marker(object):
 	def __init__(self,mid,upcam_id,stamp,corners):
@@ -89,7 +89,7 @@ class MobileMarker(Marker):
 		self.posePub.publish(self.pose_msg) #Publish ego mark pose. 
 
 class fake_gps: 
-	def __init__(self, cam=0, arucoDict=cv2.aruco.DICT_4X4_50, cam_id=0,camera_src='internal', refids={'0'}, markerLen=0.1): 
+	def __init__(self, cam=0, arucoDict=cv2.aruco.DICT_4X4_50, cam_id=0,camera_src='internal', refids={'0'}, markerLen=0.1, enable_tf=False): 
 		self.bridge = CvBridge() #When using rosbag as src image
 		self.arucoDict = cv2.aruco.Dictionary_get(arucoDict) 
 		self.markerLen = markerLen #square mark lenght 
@@ -97,17 +97,20 @@ class fake_gps:
 		self.refids = refids #Set of known reference markers' ids
 		self.frame_q = queue.Queue(maxsize=1) #To share video frames into different threads 
 		self.time = rospy.Time.now()
+		self.tf_enabled = enable_tf
 		self.tfBuffer = tf2_ros.Buffer() #This and the following are used for tf transformations
 		#self.listener = tf2_ros.TransformListener(self.tfBuffer) 
 			#This is recquired to import all TF transformations	
 			#tf broadcast will be only used for debugging purpopses
-		topic_bn = '/sensors/global_camera'
+		topic_bn = '/sensors/global_camera_'+str(cam_id)
+		self.markerCornersPub = rospy.Publisher(topic_bn+'/marks_corners',MarkerEdgeArray,queue_size=1)
+		
 		calib_f = "calibration_files/cam_"+str(cam_id)+"_calibration_600p.yaml"
 		self.cam_model = CameraModel(paramfile=calib_f,topic=topic_bn+'/info')
 		if camera_src == 'internal': 
 			self.cam = cv2.VideoCapture(cam)
-			self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-			self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+			self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, 800)
+			self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 600)
 		else:
 			self.view_sub = rospy.Subscriber(topic_bn+'/image', Image, self.callback)
 			if camera_src == 'gazebo': 
@@ -143,10 +146,20 @@ class fake_gps:
 		if ids is None:
 			return
 		stamp = rospy.Time.now()
+		
+		markerArray = MarkerEdgeArray() #Instantiate marks corners message. 
+		markerArray.header.frame_id = "base_link"
+		markerArray.header.stamp = stamp
+
 		#Classify them as reference markers and mobile markers.
 		ref_marks = {}
 		mob_marks = {}
 		for i in range(len(ids)):
+			marker_edges = MarkerEdge() #Creating markers msg item
+			marker_edges.id = ids[i]
+			marker_edges.corners = list(corners[i].flatten())
+			markerArray.MarkerEdges.append(marker_edges)
+
 			id_dict = str(ids[i,0])
 			#Get marker to camera transformation in (rotational vector, translation vector)
 			rvec,tvec = cv2.aruco.estimatePoseSingleMarkers([corners[i]],
@@ -154,15 +167,18 @@ class fake_gps:
 			if id_dict in self.refids:
 				marker = Marker(id_dict,self.cam_id,stamp,corners) 
 				marker.set_relative_pose(rvec,tvec)
-				marker.broadcast_tf(rvec,tvec)
+				if self.tf_enabled:
+					marker.broadcast_tf(rvec,tvec)
 				ref_marks[id_dict] = marker
 				continue #To next detected marker.
 			else:
 				marker = MobileMarker(id_dict,self.cam_id,stamp,corners) 
 				marker.set_relative_pose(rvec,tvec)
-				marker.broadcast_tf(rvec,tvec)
+				if self.tf_enabled:
+					marker.broadcast_tf(rvec,tvec)
 				mob_marks[id_dict] = marker
 			#Pass if its a mobile marker.
+		#FUTURE: Recolecting rejected squares.
 		for mm in mob_marks.values():
 			#Find nearest reference marker
 			min_dist = 1E9
@@ -184,8 +200,9 @@ def main(args):
 	rospy.init_node('fakegps',anonymous=True)
 	cam_src = rospy.get_param("~cam_src", "internal") #Unique for each vehicle
 	upper_cam_id = rospy.get_param("~upcam_id",0)
+	en_tf = rospy.get_param("~enable_tf", False)
 	ref_marks = marks_offset.keys()
-	node = fake_gps(0,cam_id=upper_cam_id,camera_src=cam_src,refids=ref_marks) 
+	node = fake_gps(0,cam_id=upper_cam_id,camera_src=cam_src,refids=ref_marks,enable_tf=en_tf) 
 	if not cam_src=='internal':	
 		try:
 			rospy.spin()
