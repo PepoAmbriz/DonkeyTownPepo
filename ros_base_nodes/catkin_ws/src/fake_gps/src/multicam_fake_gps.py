@@ -167,14 +167,14 @@ class fake_gps:
 			rvec,tvec = cv2.aruco.estimatePoseSingleMarkers([corners[i]],
 						self.markerLen,self.cam_model.mat,self.cam_model.dist)
 			if id_dict in self.refids:
-				marker = Marker(id_dict,self.cam_id,stamp,corners) 
+				marker = Marker(id_dict,self.cam_id,stamp,corners[i]) 
 				marker.set_relative_pose(rvec,tvec)
 				if self.tf_enabled:
 					marker.broadcast_tf(rvec,tvec)
 				ref_marks[id_dict] = marker
 				continue #To next detected marker.
 			else:
-				marker = MobileMarker(id_dict,self.cam_id,stamp,corners) 
+				marker = MobileMarker(id_dict,self.cam_id,stamp,corners[i]) 
 				marker.set_relative_pose(rvec,tvec)
 				if self.tf_enabled:
 					marker.broadcast_tf(rvec,tvec)
@@ -183,24 +183,33 @@ class fake_gps:
 		self.markerCornersPub.publish(markerArray)
 		#FUTURE: Recolecting rejected squares.
 		#TODO: check current ref_markers sanity.
-		for test_rm in ref_marks:
+		for test_rm in ref_marks.values():
 			test_rm_mid = test_rm.mid
 			if not test_rm_mid in self.ref_marks:
 				self.ref_marks[test_rm_mid] = test_rm
 				continue
-			for good_rm in self.ref_marks:
+			for good_rm in self.ref_marks.values():
 				if test_rm_mid == good_rm.mid:
 					continue
 				h_test_to_good = np.matmul(np.linalg.inv(test_rm.relH),good_rm.relH)
-				(g_r,g_p,g_y) = euler_from_matrix(h_rm_to_good[0:3,0:3])
+				(g_r,g_p,g_y) = euler_from_matrix(h_test_to_good[0:3,0:3])
 				(t_xo,t_yo,t_tho) = marks_offset[str(test_rm.mid)]
 				(g_xo,g_yo,g_tho) = marks_offset[str(good_rm.mid)]
-				print("Relative distances from marker detection:")
-				pritn("x: ",g_xo-t_xo)
-				pritn("y: ",g_yo-t_yo)
-				print("th: ",g_tho-t_tho)
-				self.ref_marks[test_rm_mid] = test_rm
-
+				#print("Results from "+str(test_rm_mid)+" to" +str(good_rm.mid))
+				#print("Relative distances from marks_off:")
+				#print("x: ",g_xo-t_xo)
+				#print("y: ",g_yo-t_yo)
+				#print("th: ",g_tho-t_tho)
+				#print("Relative distances from marker detection")
+				#print("x: ",h_test_to_good[0,3])
+				#print("y: ",h_test_to_good[1,3])
+				#print("th: ",g_y)
+				x_dist = g_xo-t_xo-h_test_to_good[0,3]
+				y_dist = g_yo-t_yo-h_test_to_good[1,3]
+				th_dist = g_tho-t_tho-g_y
+				if((x_dist**2+y_dist**2)**0.5 < 0.1):
+					self.ref_marks[test_rm_mid] = test_rm
+					break
 		for mm in mob_marks.values():
 			#Find nearest reference marker
 			min_dist = 1E9
@@ -238,3 +247,4 @@ def main(args):
 
 if __name__=='__main__':
 	main(sys.argv)
+
