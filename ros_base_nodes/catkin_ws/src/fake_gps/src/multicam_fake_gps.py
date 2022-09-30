@@ -1,6 +1,16 @@
 #!/usr/bin/env python2
-#Works only for all-same-oriented-fiducial-marks scenarios
-#Always taking paramters.yaml as camera model, even when gazebo model is the one. To be fixed. Still pending?
+#Works only for all-same-oriented-fiducial-marks scenarios. To be left this way.
+#Always taking paramters.yaml as camera model, even when gazebo model is the one. To be fixed. Still pending? Not at least in gazebo.
+
+"""
+ros parameters:
+	cam_src = {"internal", "gazebo", "rosbag"}. Tells who is producing the image.
+	upper_cam_id = {0,1,2,...} Tells which upper cam is executing this node.
+	deb_lvl = {0,1,2}. 	0: None
+						1: Publish detected marker's corners.
+						2: Broadcast tf.
+"""
+
 import rospy
 import cv2
 import sys
@@ -89,7 +99,7 @@ class MobileMarker(Marker):
 		self.posePub.publish(self.pose_msg) #Publish ego mark pose. 
 
 class fake_gps: 
-	def __init__(self, cam=0, arucoDict=cv2.aruco.DICT_4X4_50, cam_id=0,camera_src='internal', refids={'0'}, markerLen=0.1, enable_tf=False): 
+	def __init__(self, cam=0, arucoDict=cv2.aruco.DICT_4X4_50, cam_id=0,camera_src='internal', refids={'0'}, markerLen=0.1, debug_lvl=0): 
 		self.bridge = CvBridge() #When using rosbag as src image
 		self.arucoDict = cv2.aruco.Dictionary_get(arucoDict) 
 		self.markerLen = markerLen #square mark lenght 
@@ -98,8 +108,8 @@ class fake_gps:
 		self.ref_marks = {}
 		self.frame_q = queue.Queue(maxsize=1) #To share video frames into different threads 
 		self.time = rospy.Time.now()
-		self.tf_enabled = enable_tf
-		if enable_tf:
+		self.deb_lvl = int(debug_lvl)
+		if self.deb_lvl>1:
 			self.tfBuffer = tf2_ros.Buffer() #This and the following are used for tf transformations
 		#self.listener = tf2_ros.TransformListener(self.tfBuffer) 
 			#This is recquired to import all TF transformations	
@@ -169,19 +179,19 @@ class fake_gps:
 			if id_dict in self.refids:
 				marker = Marker(id_dict,self.cam_id,stamp,corners[i]) 
 				marker.set_relative_pose(rvec,tvec)
-				if self.tf_enabled:
+				if self.deb_lvl>1:
 					marker.broadcast_tf(rvec,tvec)
 				ref_marks[id_dict] = marker
 				continue #To next detected marker.
 			else:
 				marker = MobileMarker(id_dict,self.cam_id,stamp,corners[i]) 
 				marker.set_relative_pose(rvec,tvec)
-				if self.tf_enabled:
+				if self.deb_lvl>1:
 					marker.broadcast_tf(rvec,tvec)
 				mob_marks[id_dict] = marker
 			#Pass if its a mobile marker.
-		self.markerCornersPub.publish(markerArray)
-		#FUTURE: Recolecting rejected squares.
+		if self.deb_lvl>0:
+			self.markerCornersPub.publish(markerArray)
 		#TODO: check current ref_markers sanity.
 		for test_rm in ref_marks.values():
 			test_rm_mid = test_rm.mid
@@ -208,6 +218,7 @@ class fake_gps:
 				y_dist = g_yo-t_yo-h_test_to_good[1,3]
 				th_dist = g_tho-t_tho-g_y
 				if((x_dist**2+y_dist**2)**0.5 < 0.1):
+					print("Meet sanity criteria")
 					self.ref_marks[test_rm_mid] = test_rm
 					break
 		for mm in mob_marks.values():
@@ -229,11 +240,11 @@ class fake_gps:
 				print("Couldn't compute absolute pose of mobile marker"+str(mm.mid))
 def main(args):
 	rospy.init_node('fakegps',anonymous=True)
-	cam_src = rospy.get_param("~cam_src", "internal") #Unique for each vehicle
+	cam_src = rospy.get_param("~cam_src", "internal")
 	upper_cam_id = rospy.get_param("~upcam_id",0)
-	en_tf = rospy.get_param("~enable_tf", False)
+	deb_lvl = rospy.get_param("~debug_lvl", 0)
 	ref_marks = marks_offset.keys()
-	node = fake_gps(0,cam_id=upper_cam_id,camera_src=cam_src,refids=ref_marks,enable_tf=en_tf) 
+	node = fake_gps(0,cam_id=upper_cam_id,camera_src=cam_src,refids=ref_marks,debug_lvl=deb_lvl) 
 	if not cam_src=='internal':	
 		try:
 			rospy.spin()
@@ -247,4 +258,3 @@ def main(args):
 
 if __name__=='__main__':
 	main(sys.argv)
-
