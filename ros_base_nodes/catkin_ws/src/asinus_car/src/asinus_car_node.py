@@ -46,11 +46,10 @@ class AsinusCar:
 		self.volt = volt
 		dths = np.array([dth_l,dth_r])/self.gear_corr
 		dt = cur_time-self.last_time
-		self.cur_rpm = dths/dt
+		self.cur_rpm = 60.0*dths/dt
+		print(self.cur_rpm)
 		self.last_time = cur_time
 	
-
-
 #Periodically get displacements.
 #Periodically publish speed (twist?, angular rpm is useful for debugging thou)
 #Kalman Filter
@@ -92,7 +91,7 @@ def main():
 	robot_id = rospy.get_param("~car_id") #Unique for each vehicle  
 	node = asinus_car_node(robot_id)
 	try:
-		node.talker(10)
+		node.talker(100)
 	except rospy.ROSInterruptException:
 		rospy.loginfo("asinucar node terminated.")
 
