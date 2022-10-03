@@ -7,7 +7,7 @@ material Circuit/Mat
     {
       texture_unit
       {
-        texture new_circuit_sf.png
+        texture cimat_reduced.png
       }
     }
   }
