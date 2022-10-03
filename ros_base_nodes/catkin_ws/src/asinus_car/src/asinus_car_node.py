@@ -23,7 +23,7 @@ class DDR:
 
 
 class AsinusCar:
-	def __init__(self,L,r,time,gear_corr=1):
+	def __init__(self,L,r,gear_corr=1):
 		self.L = L
 		self.r = r
 		self.gear_corr = gear_corr #How much is the asinus car actually faster?
@@ -36,7 +36,7 @@ class AsinusCar:
 	def setSpeeds(self,rpm_l,rpm_r):
 		self.req_rpm = np.array([rpm_l,rpm_r])
 	def getMeasures(self):
-		return (self.cur_rpm[0],self.cur_rpm[1],volt)
+		return (self.cur_rpm[0],self.cur_rpm[1],self.volt)
 	def update(self):
 		self.motors.setSpeeds(self.req_rpm)
 		sleep(0.01) #Increase time gap between i2c transactions.
@@ -58,13 +58,13 @@ class AsinusCar:
 class asinus_car_node: 
 	def __init__(self,car_id): 
 		self.car_id = car_id
-		self.asinus_car = AsinusCar(0.1,0.03,rospy.Time.now())
+		self.asinus_car = AsinusCar(0.1,0.03)
 		rospy.on_shutdown(self.shutdown)
 		self.measures_pub = rospy.Publisher('/asinus_cars/'+str(car_id)+'/motors_raw_data',MotorsState,queue_size=1)
 		self.driver_sub = rospy.Subscriber('/asinus_cars/'+str(car_id)+'/motors_driver',MotorsSpeed, self.on_drive)
 		self.motor_st = MotorsState()
 	def on_drive(self,speed_msg):
-		self.asinus_car.setSpeeds([speed_msg.leftMotor,speed_msg.rightMotor])
+		self.asinus_car.setSpeeds(speed_msg.leftMotor,speed_msg.rightMotor)
 	def talker(self,rate):
 		rate = rospy.Rate(rate)
 		while not rospy.is_shutdown():
@@ -74,13 +74,13 @@ class asinus_car_node:
 			self.motors_publish(rpm_l,rpm_r,volt,stamp)
 			#publish estimation
 			#Kalman FIlter (Another speed...)
-			rospy.sleep()
+			rate.sleep()
 	def motors_publish(self,rpm_l,rpm_r,volt,stamp):
 		self.motor_st.speed.leftMotor = rpm_l
 		self.motor_st.speed.rightMotor = rpm_r
 		self.motor_st.voltage = volt
 		self.motor_st.header.stamp = stamp
-		self.measures_pub(self.motor_st)
+		self.measures_pub.publish(self.motor_st)
 	def shutdown(self):
 		print("shutdown!")
 		rospy.sleep(1)
@@ -92,7 +92,7 @@ def main():
 	robot_id = rospy.get_param("~car_id") #Unique for each vehicle  
 	node = asinus_car_node(robot_id)
 	try:
-		node.talker()
+		node.talker(10)
 	except rospy.ROSInterruptException:
 		rospy.loginfo("asinucar node terminated.")
 
