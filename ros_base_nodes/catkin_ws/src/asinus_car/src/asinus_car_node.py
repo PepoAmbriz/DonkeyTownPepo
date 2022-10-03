@@ -7,9 +7,9 @@ from time import time,sleep
 import numpy as np
 from math import cos,sin,pi
 from geometry_msgs.msg import PoseWithCovarianceStamped as PCS
-from tf.transformations import quaternion_from_euler
+#from tf.transformations import quaternion_from_euler
 
-class DDR:
+class DDR(object):
 	def __init__(self,q0):
 		self.x = q0[0]
 		self.y = q0[1]
@@ -18,9 +18,11 @@ class DDR:
 		self.x += ds*cos(self.th+0.5*dth)
 		self.y += ds*sin(self.th+0.5*dth)
 		self.th += dth
+		print("----")
+		print(self.x,self.y,self.th)
 class DDR_KF(DDR):
-	def __init__(sefl,q0,p0=1000,R=np.eye(3),self.kQ=1):
-		super().__init__(q0)
+	def __init__(self,q0,p0=1000,R=np.eye(3),kQ=1):
+		super(DDR_KF,self).__init__(q0)
 		self.P = p0*np.eye(3)
 		self.R = R
 		self.kQ = kQ
@@ -106,7 +108,7 @@ class AsinusCar:
 		#KF update
 		#Convert dths to distance displacement... degs -> rad -> m
 		du = self.r*(pi/180)*dths
-		self.KF.predict(dl=du[0],dr=du[1],axis_L=L)
+		self.KF.predict(dl=du[0],dr=du[1],axis_L=self.L)
 		self.last_time = cur_time
 
 
@@ -122,7 +124,7 @@ class asinus_car_node:
 		msg_stamp = rospy.Time.now()
 		self.init_msgs(msg_stamp)
 		self.measures_pub = rospy.Publisher('/asinus_cars/'+str(car_id)+'/motors_raw_data',MotorsState,queue_size=1)
-		self.posePub = rospy.Publisher("/asinus_cars/"+str(robot_id)+"/filtered_pose",PCS,queue_size=1)
+		self.posePub = rospy.Publisher("/asinus_cars/"+str(car_id)+"/filtered_pose",PCS,queue_size=1)
 		self.driver_sub = rospy.Subscriber('/asinus_cars/'+str(car_id)+'/motors_driver',MotorsSpeed, self.on_drive)
 
 	def on_drive(self,speed_msg):
@@ -141,7 +143,7 @@ class asinus_car_node:
 			rate.sleep()
 	def motors_publish(self,rpm_l,rpm_r,volt,stamp):
 		if (stamp-self.motor_st.header.stamp).to_sec() < (1/self.publish_rate):
-            return
+            		return
 		self.motor_st.speed.leftMotor = rpm_l
 		self.motor_st.speed.rightMotor = rpm_r
 		self.motor_st.voltage = volt
@@ -153,11 +155,11 @@ class asinus_car_node:
 		self.pose_msg.pose.pose.position.x = self.asinus_car.KF.x
 		self.pose_msg.pose.pose.position.y = self.asinus_car.KF.y
 		yaw = self.asinus_car.KF.th
-		quat = quaternion_from_euler(0.0,0.0,yaw)
-		self.pose_msg.pose.pose.orientation.x = quat[0]
-		self.pose_msg.pose.pose.orientation.y = quat[1]
-		self.pose_msg.pose.pose.orientation.z = quat[2]
-		self.pose_msg.pose.pose.orientation.w = quat[3]
+		#quat = quaternion_from_euler(0.0,0.0,yaw)
+		#self.pose_msg.pose.pose.orientation.x = quat[0]
+		#self.pose_msg.pose.pose.orientation.y = quat[1]
+		#self.pose_msg.pose.pose.orientation.z = quat[2]
+		#self.pose_msg.pose.pose.orientation.w = quat[3]
 		self.posePub.publish(self.pose_msg)
 	def shutdown(self):
 		print("shutdown!")
