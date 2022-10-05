@@ -9,7 +9,7 @@
     <include>
         <uri>model://circuit</uri>
         <name>circuit</name>
-        <pose>0.0 -0.00 0.001 0 0 1.5708</pose>
+        <pose>0.0 0.00 0.001 0 0 1.5708</pose>
     </include>
 
     <include>
@@ -19,22 +19,34 @@
     <include>
         <uri>model://ros_camera</uri>
         <name>camera1</name>
-        <pose> 0.0 0.0 2.4 0.0 1.5708 1.5708</pose>
+        <pose> -1.1 -1.1 2.4 0.0 1.1 0.78539</pose>
     </include>
 
     <include>
         <uri>model://aruco_visual_marker_0</uri>
         <name>aruco_marker_0</name>
-        <pose>-0.5 -0.00 0.002 0 0 1.5708</pose>
+        <pose>-0.48 0.48 0.002 0 0 1.5708</pose>
     </include>
 
     <include>
         <uri>model://aruco_visual_marker_1</uri>
         <name>aruco_marker_1</name>
-        <pose>0.5 -0.00 0.002 0 0 1.5708</pose>
+        <pose>0.48 -0.48 0.002 0 0 1.5708</pose>
     </include>
 
+    <include>
+        <uri>model://aruco_visual_marker_2</uri>
+        <name>aruco_marker_2</name>
+        <pose>-1.09 1.09 0.002 0 0 1.5708</pose>
+    </include>
 
+    <include>
+        <uri>model://aruco_visual_marker_7</uri>
+        <name>aruco_marker_7</name>
+        <pose>1.09 -1.09 0.002 0 0 1.5708</pose>
+    </include>
+
+<!--
     <include>
       <uri>model://osito_blanco</uri>
       <name>osito_blanco_1</name>
@@ -46,7 +58,7 @@
       <name>osito_cafe_1</name>
       <pose>0 -0.75 0 0 0 0</pose>
     </include>
-
+-->
 
 <!-- for refenrence only -->
 <!--

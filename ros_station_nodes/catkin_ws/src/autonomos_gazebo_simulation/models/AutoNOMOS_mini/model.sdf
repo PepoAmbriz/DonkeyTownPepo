@@ -644,7 +644,7 @@
           <script>
           <uri>model://AutoNOMOS_mini/materials/scripts</uri>
           <uri>model://AutoNOMOS_mini/materials/textures</uri>
-          <name>ArucoVisualMarker7/Marker</name>
+          <name>ArucoVisualMarker/Marker</name>
           </script>          
         </material>
       </visual>

@@ -1,5 +1,5 @@
  
-material ArucoVisualMarker/Marker
+material ArucoVisualMarker7/Marker
 {
   technique
   {
@@ -7,7 +7,7 @@ material ArucoVisualMarker/Marker
     {
       texture_unit
       {
-        texture aruco_mark_10.png
+        texture aruco_mark_7.png
       }
     }
   }

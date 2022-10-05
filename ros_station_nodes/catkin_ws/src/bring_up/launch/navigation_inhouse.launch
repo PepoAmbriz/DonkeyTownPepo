@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-  <remap from="/camera" to="/sensors/global_camera" />
-  <remap from="/sensors/global_camera/image_raw" to="/sensors/global_camera/image" />
-  <remap from="/sensors/global_camera/camera_info" to="/sensors/global_camera/info" />
+  <remap from="/camera" to="/sensors/global_camera_0" />
+  <remap from="/sensors/global_camera_0/image_raw" to="/sensors/global_camera_0/image" />
+  <remap from="/sensors/global_camera_0/camera_info" to="/sensors/global_camera_0/info" />
   
   <env name="GAZEBO_MODEL_PATH" value="$(find autonomos_gazebo_simulation)/models:$(optenv GAZEBO_MODEL_PATH)"/>
   <env name="GAZEBO_RESOURCE_PATH" value="$(find autonomos_gazebo_simulation)/worlds:$(optenv GAZEBO_RESOURCE_PATH)"/>
