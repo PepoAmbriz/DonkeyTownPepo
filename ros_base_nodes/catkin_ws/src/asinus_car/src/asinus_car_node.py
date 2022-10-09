@@ -3,11 +3,16 @@
 import rospy 
 from asinus import AsinusMotors as motors 
 from donkietown_msgs.msg import MotorsSpeed, MotorsState
+
 from time import time,sleep
 import numpy as np
 from math import cos,sin,pi
 from geometry_msgs.msg import PoseWithCovarianceStamped as PCS
-#from tf.transformations import quaternion_from_euler
+from tf.transformations import quaternion_from_euler, euler_from_quaternion
+
+from misc import SensorQ
+#TODO: 
+#	[ ]: Add CAM messages
 
 class DDR(object):
 	def __init__(self,q0):
@@ -20,14 +25,18 @@ class DDR(object):
 		self.th += dth
 		print("----")
 		print(self.x,self.y,self.th)
+
+#Kalman filter
+#https://www.cs.princeton.edu/courses/archive/fall11/cos495/COS495-Lecture17-EKFLocalization.pdf
 class DDR_KF(DDR):
-	def __init__(self,q0,p0=1000,R=np.eye(3),kQ=1):
+	def __init__(self,q0,p0=1000.0,R=np.eye(3),kQ=1):
 		super(DDR_KF,self).__init__(q0)
+		self.p0 = p0
 		self.P = p0*np.eye(3)
 		self.R = R
-		self.kQ = kQ
+		self.kQ = kQ #Constant gain for moel's covariance matrix
 		self.H = np.eye(3) #As it is.
-		self.enabled = True #Shall be False in prod.
+		self.enabled = False #Shall be False in prod.
 	def predict(self,dl,dr,axis_L):
 		#dl: How much (in meters) left wheel has been displaced since last prediction
 		#dr: dl but for right wheel.
@@ -69,16 +78,15 @@ class DDR_KF(DDR):
 		self.x = q0[0]
 		self.y = q0[1]
 		self.th = q0[2]
+		self.P = self.p0*np.eye(3)
 		self.enabled = True
 	def disable(self):
 		self.enabled = False
-
-#Kalman filter
-#https://www.cs.princeton.edu/courses/archive/fall11/cos495/COS495-Lecture17-EKFLocalization.pdf
-
+	def sanity_check(self):
+		return np.trace(self.P) < 6.0*self.p0
 
 class AsinusCar:
-	def __init__(self,L,r,gear_corr=1):
+	def __init__(self,L,r,gear_corr=1.0):
 		self.L = L
 		self.r = r
 		self.gear_corr = gear_corr #How much is the asinus car actually faster?
@@ -88,7 +96,8 @@ class AsinusCar:
 		self.req_rpm = np.zeros(2)
 		self.volt = 5.0
 		self.last_time = time()
-		self.KF = DDR_KF([0,0,0])
+		self.KF = DDR_KF([0.0,0.0,0.0]) #Init at (x=0.0, y=-0.0, th=0.0) Just to give it an initial value.
+		self.gpsQ =  SensorQ(width=3,depth=5,timeout=1) #data sensor queue for gps data filtering.
 	def setSpeeds(self,rpm_l,rpm_r):
 		self.req_rpm = np.array([rpm_l,rpm_r])
 	def getMeasures(self):
@@ -102,23 +111,33 @@ class AsinusCar:
 		sleep(0.01)
 		#End of I2C transaction
 		self.volt = volt
-		dths = np.array([dth_l,dth_r])/self.gear_corr
+		dths = np.array([dth_l,dth_r])*self.gear_corr
 		dt = cur_time-self.last_time
 		self.cur_rpm = 60.0*dths/dt
-		#KF update
-		#Convert dths to distance displacement... degs -> rad -> m
-		du = self.r*(pi/180)*dths
-		self.KF.predict(dl=du[0],dr=du[1],axis_L=self.L)
+		du = self.r*2*pi*dths #Convert dths to distance displacement... % -> rad -> m
+		self.KF.predict(dl=du[0],dr=du[1],axis_L=self.L) #KF update
 		self.last_time = cur_time
-
-
+	def gps_correct(self,x,y,th,stamp):
+		sense_data = [x,y,th]
+		self.gpsQ.push(sense_data,stamp)
+		#gps data sanity check
+		if self.gpsQ.get_depth() < 3:
+			return
+		for mean,std,data in zip(self.gpsQ.mean,self.gpsQ.std,sense_data): 
+			if abs(data-mean) > 1.0*std:
+				return
+		#If passes gps data sanity check
+		if (not self.KF.enabled) or (not self.KF.sanity_check()):
+			self.KF.reinitialize(sense_data)
+			return
+		self.KF.correct(x,y,th)
 	
 #Periodically publish speed (twist?, angular rpm is useful for debugging thou)
 #Kalman Filter
 class asinus_car_node: 
 	def __init__(self,car_id,publish_rate=10): 
 		self.car_id = car_id
-		self.asinus_car = AsinusCar(0.1,0.03)
+		self.asinus_car = AsinusCar(0.125,0.03)
 		rospy.on_shutdown(self.shutdown)
 		self.publish_rate = publish_rate
 		msg_stamp = rospy.Time.now()
@@ -126,24 +145,36 @@ class asinus_car_node:
 		self.measures_pub = rospy.Publisher('/asinus_cars/'+str(car_id)+'/motors_raw_data',MotorsState,queue_size=1)
 		self.posePub = rospy.Publisher("/asinus_cars/"+str(car_id)+"/filtered_pose",PCS,queue_size=1)
 		self.driver_sub = rospy.Subscriber('/asinus_cars/'+str(car_id)+'/motors_driver',MotorsSpeed, self.on_drive)
+		self.gps_sub = rospy.Subscriber("/fake_gps/ego_pose_raw/"+str(car_id), PCS, self.on_gps)
 
 	def on_drive(self,speed_msg):
 		self.asinus_car.setSpeeds(speed_msg.leftMotor,speed_msg.rightMotor)
+	def on_gps(self,pcs_msg):
+		x = pcs_msg.pose.pose.position.x
+		y = pcs_msg.pose.pose.position.y
+		qx = pcs_msg.pose.pose.orientation.x
+		qy = pcs_msg.pose.pose.orientation.y
+		qz = pcs_msg.pose.pose.orientation.z
+		qw = pcs_msg.pose.pose.orientation.w
+		(roll,pitch,yaw) = euler_from_quaternion([qx,qy,qz,qw])
+		stamp = pcs_msg.header.stamp.to_sec()
+		self.asinus_car.gps_correct(x,y,yaw,stamp)
 	def talker(self,rate):
 		rate = rospy.Rate(rate)
 		#Reduce publishing frequency.
 		while not rospy.is_shutdown():
 			stamp = rospy.Time.now()
 			self.asinus_car.update()
-			(rpm_l,rpm_r,volt) = self.asinus_car.getMeasures()
-			self.motors_publish(rpm_l,rpm_r,volt,stamp)
+			
+			self.motors_publish(stamp)
 			#publish estimation
 			self.pose_publish(stamp)
 			#Kalman FIlter (Another speed...)
 			rate.sleep()
-	def motors_publish(self,rpm_l,rpm_r,volt,stamp):
+	def motors_publish(self,stamp):
 		if (stamp-self.motor_st.header.stamp).to_sec() < (1/self.publish_rate):
-            		return
+			return
+		(rpm_l,rpm_r,volt) = self.asinus_car.getMeasures()
 		self.motor_st.speed.leftMotor = rpm_l
 		self.motor_st.speed.rightMotor = rpm_r
 		self.motor_st.voltage = volt
@@ -155,11 +186,22 @@ class asinus_car_node:
 		self.pose_msg.pose.pose.position.x = self.asinus_car.KF.x
 		self.pose_msg.pose.pose.position.y = self.asinus_car.KF.y
 		yaw = self.asinus_car.KF.th
-		#quat = quaternion_from_euler(0.0,0.0,yaw)
-		#self.pose_msg.pose.pose.orientation.x = quat[0]
-		#self.pose_msg.pose.pose.orientation.y = quat[1]
-		#self.pose_msg.pose.pose.orientation.z = quat[2]
-		#self.pose_msg.pose.pose.orientation.w = quat[3]
+		quat = quaternion_from_euler(0.0,0.0,yaw) #euler_to_quaternion([0.0,0.0,yaw])
+		#converting Pose2D cov matrix to full 6dof cov matrix.
+		self.pose_msg.pose.pose.orientation.x = quat[0]
+		self.pose_msg.pose.pose.orientation.y = quat[1]
+		self.pose_msg.pose.pose.orientation.z = quat[2]
+		self.pose_msg.pose.pose.orientation.w = quat[3]
+		self.pose_msg.pose.covariance[0] = self.KF.P[0,0]
+		self.pose_msg.pose.covariance[1] = self.KF.P[0,1]
+		self.pose_msg.pose.covariance[5] = self.KF.P[0,2]
+		self.pose_msg.pose.covariance[6] = self.KF.P[1,0]
+		self.pose_msg.pose.covariance[7] = self.KF.P[1,1]
+		self.pose_msg.pose.covariance[11] = self.KF.P[1,2]
+		self.pose_msg.pose.covariance[30] = self.KF.P[2,0]
+		self.pose_msg.pose.covariance[31] = self.KF.P[2,1]
+		self.pose_msg.pose.covariance[35] = self.KF.P[2,2]
+		self.pose_msg.header.stamp = stamp
 		self.posePub.publish(self.pose_msg)
 	def shutdown(self):
 		print("shutdown!")
@@ -177,7 +219,6 @@ class asinus_car_node:
 										 0,0,0,0,0,0,
 										 0,0,0,0,0,0,
 										 0.01,0.01,0,0,0,0.1]
-
 def main():
 	rospy.init_node('asinus_car_node',anonymous=True)
 	robot_id = rospy.get_param("~car_id") #Unique for each vehicle  
