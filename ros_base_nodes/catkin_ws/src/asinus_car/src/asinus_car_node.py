@@ -23,17 +23,15 @@ class DDR(object):
 		self.x += ds*cos(self.th+0.5*dth)
 		self.y += ds*sin(self.th+0.5*dth)
 		self.th += dth
-		print("----")
-		print(self.x,self.y,self.th)
 
 #Kalman filter
 #https://www.cs.princeton.edu/courses/archive/fall11/cos495/COS495-Lecture17-EKFLocalization.pdf
 class DDR_KF(DDR):
-	def __init__(self,q0,p0=1000.0,R=np.eye(3),kQ=1):
+	def __init__(self,q0,p0=10.0,R=np.eye(3),kQ=0.1):
 		super(DDR_KF,self).__init__(q0)
 		self.p0 = p0
 		self.P = p0*np.eye(3)
-		self.R = R
+		self.R = 0.1*R
 		self.kQ = kQ #Constant gain for moel's covariance matrix
 		self.H = np.eye(3) #As it is.
 		self.enabled = False #Shall be False in prod.
@@ -100,6 +98,7 @@ class AsinusCar:
 		self.req_rpm = np.zeros(2)
 		self.volt = 5.0
 		self.last_time = time()
+		R = np.array([[0.02,0.0,0.0],[0.0,0.02,0.0],[0.0,0.0,0.01]])
 		self.KF = DDR_KF([0.0,0.0,0.0]) #Init at (x=0.0, y=-0.0, th=0.0) Just to give it an initial value.
 		self.gpsQ =  SensorQ(width=3,depth=5,timeout=1) #data sensor queue for gps data filtering.
 	def setSpeeds(self,rpm_l,rpm_r):
@@ -128,12 +127,14 @@ class AsinusCar:
 		if self.gpsQ.get_depth() < 3:
 			return
 		for mean,std,data in zip(self.gpsQ.mean,self.gpsQ.std,sense_data): 
-			if abs(data-mean) > 1.0*std:
+			if abs(data-mean) > 1.5*std:
 				return
 		#If passes gps data sanity check
 		if (not self.KF.enabled) or (not self.KF.sanity_check()):
+			print("Reinitializing")
 			self.KF.reinitialize(sense_data)
 			return
+		print(self.gpsQ.std)
 		self.KF.correct(x,y,th)
 	
 #Periodically publish speed (twist?, angular rpm is useful for debugging thou)
@@ -196,15 +197,15 @@ class asinus_car_node:
 		self.pose_msg.pose.pose.orientation.y = quat[1]
 		self.pose_msg.pose.pose.orientation.z = quat[2]
 		self.pose_msg.pose.pose.orientation.w = quat[3]
-		self.pose_msg.pose.covariance[0] = self.KF.P[0,0]
-		self.pose_msg.pose.covariance[1] = self.KF.P[0,1]
-		self.pose_msg.pose.covariance[5] = self.KF.P[0,2]
-		self.pose_msg.pose.covariance[6] = self.KF.P[1,0]
-		self.pose_msg.pose.covariance[7] = self.KF.P[1,1]
-		self.pose_msg.pose.covariance[11] = self.KF.P[1,2]
-		self.pose_msg.pose.covariance[30] = self.KF.P[2,0]
-		self.pose_msg.pose.covariance[31] = self.KF.P[2,1]
-		self.pose_msg.pose.covariance[35] = self.KF.P[2,2]
+		self.pose_msg.pose.covariance[0] = self.asinus_car.KF.P[0,0]
+		self.pose_msg.pose.covariance[1] = self.asinus_car.KF.P[0,1]
+		self.pose_msg.pose.covariance[5] = self.asinus_car.KF.P[0,2]
+		self.pose_msg.pose.covariance[6] = self.asinus_car.KF.P[1,0]
+		self.pose_msg.pose.covariance[7] = self.asinus_car.KF.P[1,1]
+		self.pose_msg.pose.covariance[11] = self.asinus_car.KF.P[1,2]
+		self.pose_msg.pose.covariance[30] = self.asinus_car.KF.P[2,0]
+		self.pose_msg.pose.covariance[31] = self.asinus_car.KF.P[2,1]
+		self.pose_msg.pose.covariance[35] = self.asinus_car.KF.P[2,2]
 		self.pose_msg.header.stamp = stamp
 		self.posePub.publish(self.pose_msg)
 	def shutdown(self):

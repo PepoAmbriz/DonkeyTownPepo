@@ -1,7 +1,7 @@
 from collections import deque
 import numpy as np
 
-def sub_ang(th1,th2):
+def subs_ang(th1,th2):
 	dth = (th1-th2)%(2*np.pi)
 	if dth>np.pi:
 		dth %= -np.pi
@@ -19,6 +19,7 @@ class SensorQ:
 	def push(self,data,stamp):
 		if stamp-self.stamp > self.timeout:
 			self.flush()
+			print("Flushing")
 		self.stamp = stamp
 		for i in range(self.width):
 			self.qs[i].append(data[i])
