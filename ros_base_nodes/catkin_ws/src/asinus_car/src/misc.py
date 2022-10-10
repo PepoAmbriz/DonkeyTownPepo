@@ -1,7 +1,11 @@
 from collections import deque
 import numpy as np
 
-
+def sub_ang(th1,th2):
+	dth = (th1-th2)%(2*np.pi)
+	if dth>np.pi:
+		dth %= -np.pi
+	return dth
 
 class SensorQ:
 	def __init__(self,width,depth,timeout=1,stamp=0):
@@ -26,7 +30,7 @@ class SensorQ:
 	def flush(self):
 		for q in self.qs:
 			q.clear()
-	def get_len(self):
+	def get_depth(self):
 		return len(self.qs[0])
 
 

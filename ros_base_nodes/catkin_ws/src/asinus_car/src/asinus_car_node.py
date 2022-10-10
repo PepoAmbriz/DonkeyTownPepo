@@ -10,7 +10,7 @@ from math import cos,sin,pi
 from geometry_msgs.msg import PoseWithCovarianceStamped as PCS
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
 
-from misc import SensorQ
+from misc import SensorQ, subs_ang
 #TODO: 
 #	[ ]: Add CAM messages
 
@@ -63,11 +63,15 @@ class DDR_KF(DDR):
 	def correct(self,x,y,th):
 		if not self.enabled:
 			return
+		#Solve th modulus. 
+
 		#Remember that the following applies only when H=I.
 		K = np.matmul(self.P,np.linalg.inv(self.P+self.R))
 		z = np.array([x,y,th])
 		q = np.array([self.x,self.y,self.th])
-		q = q+np.matmul(K,z-q)
+		vec_dif = z-q
+		vec_dif[2] = subs_ang(th,self.th) #Clamping
+		q = q+np.matmul(K,vec_dif)
 		self.x = q[0]
 		self.y = q[1]
 		self.th = q[2]
