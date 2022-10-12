@@ -27,7 +27,7 @@ class DDR(object):
 #Kalman filter
 #https://www.cs.princeton.edu/courses/archive/fall11/cos495/COS495-Lecture17-EKFLocalization.pdf
 class DDR_KF(DDR):
-	def __init__(self,q0,p0=10.0,R=np.eye(3),kQ=0.1):
+	def __init__(self,q0,p0=10.0,R=np.eye(3),kQ=0.01):
 		super(DDR_KF,self).__init__(q0)
 		self.p0 = p0
 		self.P = p0*np.eye(3)
@@ -98,9 +98,9 @@ class AsinusCar:
 		self.req_rpm = np.zeros(2)
 		self.volt = 5.0
 		self.last_time = time()
-		R = np.array([[0.02,0.0,0.0],[0.0,0.02,0.0],[0.0,0.0,0.01]])
+		R = np.array([[0.2,0.0,0.0],[0.0,0.2,0.0],[0.0,0.0,0.4]])
 		self.KF = DDR_KF([0.0,0.0,0.0]) #Init at (x=0.0, y=-0.0, th=0.0) Just to give it an initial value.
-		self.gpsQ =  SensorQ(width=3,depth=5,timeout=1) #data sensor queue for gps data filtering.
+		self.gpsQ =  SensorQ(width=3,depth=5,timeout=2) #data sensor queue for gps data filtering.
 	def setSpeeds(self,rpm_l,rpm_r):
 		self.req_rpm = np.array([rpm_l,rpm_r])
 	def getMeasures(self):
@@ -124,17 +124,23 @@ class AsinusCar:
 		sense_data = [x,y,th]
 		self.gpsQ.push(sense_data,stamp)
 		#gps data sanity check
-		if self.gpsQ.get_depth() < 3:
+		if self.gpsQ.get_depth() < 2:
+			print("Returning due lack of data")
 			return
 		for mean,std,data in zip(self.gpsQ.mean,self.gpsQ.std,sense_data): 
-			if abs(data-mean) > 1.5*std:
+			if (abs(data-mean) > 2.0*std):
+				print("Returning due to noise")
 				return
 		#If passes gps data sanity check
 		if (not self.KF.enabled) or (not self.KF.sanity_check()):
 			print("Reinitializing")
 			self.KF.reinitialize(sense_data)
 			return
-		print(self.gpsQ.std)
+		var = np.sqrt(self.gpsQ.std)
+		self.KF.R[0,0] = var[0]
+		self.KF.R[1,1] = var[1]
+		self.KF.R[2,2] = var[2]
+		print("Correcting")
 		self.KF.correct(x,y,th)
 	
 #Periodically publish speed (twist?, angular rpm is useful for debugging thou)
