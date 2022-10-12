@@ -45,7 +45,7 @@ class global_view:
 
 def main(args):
 	rospy.init_node('global_view', anonymous=True)
-	port = rospy.get_param("~cam_port",2) #Unique for each vehicle  
+	port = rospy.get_param("~cam_port",0) #Unique for each vehicle  
 	node = global_view(port)
 	try: 
 		node.talker()
