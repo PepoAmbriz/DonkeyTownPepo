@@ -127,7 +127,7 @@ class AsinusCar:
 		if self.gpsQ.get_depth() < 2:
 			print("Returning due lack of data")
 			return
-		for mean,std,data in zip(self.gpsQ.mean,self.gpsQ.std,sense_data): 
+		for mean,std,data in zip(self.gpsQ.mean,np.sqrt(self.gpsQ.var),sense_data): 
 			if (abs(data-mean) > 2.0*std):
 				print("Returning due to noise")
 				return
@@ -136,10 +136,8 @@ class AsinusCar:
 			print("Reinitializing")
 			self.KF.reinitialize(sense_data)
 			return
-		var = np.sqrt(self.gpsQ.std)
-		self.KF.R[0,0] = var[0]
-		self.KF.R[1,1] = var[1]
-		self.KF.R[2,2] = var[2]
+		#self.KF.R = np.diag(self.gpsQ.var**0.25) #Worked, but why?
+		self.KF.R = np.diag(self.gpsQ.var)
 		print("Correcting")
 		self.KF.correct(x,y,th)
 	

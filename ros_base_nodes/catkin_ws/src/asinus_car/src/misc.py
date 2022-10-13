@@ -15,7 +15,7 @@ class SensorQ:
 		self.stamp = stamp
 		self.timeout = timeout
 		self.mean = [0 for i in range(width)]
-		self.std = [0 for i in range(width)]
+		self.var = [0 for i in range(width)]
 	def push(self,data,stamp):
 		if stamp-self.stamp > self.timeout:
 			self.flush()
@@ -24,7 +24,7 @@ class SensorQ:
 		for i in range(self.width):
 			self.qs[i].append(data[i])
 			self.mean[i] = np.mean(self.qs[i])
-			self.std[i] = np.std(self.qs[i])
+			self.var[i] = np.var(self.qs[i])
 	def pop(self):
 		for q in self.qs:
 			q.popleft()
