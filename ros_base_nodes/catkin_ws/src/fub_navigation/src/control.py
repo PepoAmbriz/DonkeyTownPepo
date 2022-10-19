@@ -40,19 +40,18 @@ class MapConfig(object):
         #self.distance_lane_3 = np.load(path + 'matrix0cm_lane3.npy')        
         
 class VectorfieldController(MapConfig):
-    def __init__(self,map_name,lane,look_ahead,model_car,car_id,speed_value=0.3):
+    def __init__(self,map_name,lane,look_ahead,model_car,car_id,speed_value=0.2):
         print(map_name,lane,look_ahead,model_car,car_id,speed_value)
-        self.lane = lane
         super(VectorfieldController,self).__init__(map_name,look_ahead)
+        
+        self.lane = lane
         if(model_car=='AutoModelMini'):    
             self.Ks = [4.0,0.0,0.2]
-            self.last_var = [0.0]
-            callbacks = [self.callback,self.on_obs_detection] #ddr
-        else:
-            self.Ks = [0.4,0.4]
-            self.last_var = [0.0,0.0]
-            callbacks = [self.ddr_callback,self.on_obs_detection] #ddr
-
+        else: #Asinus car steering control.
+            self.Ks = [3.0,0.0,2.0]
+        callbacks = [self.callback,self.on_obs_detection] #ddr
+        self.last_var = [0.0]
+            
         self.model_car = get_AutoModel(model_car,callbacks=callbacks,
 					fake_gps=True, car_id=car_id)
         
@@ -136,7 +135,7 @@ class VectorfieldController(MapConfig):
         else:
             speed = self.speed_value
 
-        gain = 1#+np.exp(-10.0*abs(steering))
+        gain = 1.0#+np.exp(-10.0*abs(steering))
         if f_x > 0:
             speed = max(self.speed_value*gain, gain*(speed* ((np.pi / 3) / (abs(steering) + 1))))
 
@@ -255,16 +254,17 @@ def get_coords_from_vf(raw_x, raw_y, resolution, map_size_x, map_size_y, matrix)
 
     vx_floor, vy_floor = matrix[x_index_floor, y_index_floor, :]
     vx_ceil, vy_ceil = matrix[x_index_ceil, y_index_ceil, :]
+
     vx = vx_floor * (1.0 - ceil_ratio_x) + vx_ceil * ceil_ratio_x
     vy = vy_floor * (1.0 - ceil_ratio_y) + vy_ceil * ceil_ratio_y
     return (vx,vy)
 
 def main():
     rospy.init_node('VectorfieldController')
-    map_name = rospy.get_param("~map_name","new_indoors")
+    map_name = rospy.get_param("~map_name","cimat_reduced")
     lane = int(rospy.get_param("~lane",'1'))
-    look_ahead = rospy.get_param("~look_ahead","25cm")
-    model_car = rospy.get_param("~model_car","AutoModelMini")
+    look_ahead = rospy.get_param("~look_ahead","30cm")
+    model_car = rospy.get_param("~model_car","AsinusCar")
     car_id = int(rospy.get_param("~car_id","7"))
     try:
         VectorfieldController(map_name=map_name,lane=lane,look_ahead=look_ahead,

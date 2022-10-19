@@ -198,7 +198,7 @@ class fake_gps:
 			if not test_rm_mid in self.ref_marks:
 				self.ref_marks[test_rm_mid] = test_rm
 				continue
-			#for good_rm in self.ref_marks.values(): #Avoids updating when camera moves.
+			#for good_rm in self.ref_marks.values(): #Avoids updating when camera moves, but might be better
 			for good_rm in ref_marks.values():
 				if test_rm_mid == good_rm.mid:
 					continue
@@ -218,7 +218,7 @@ class fake_gps:
 				x_dist = g_xo-t_xo-h_test_to_good[0,3]
 				y_dist = g_yo-t_yo-h_test_to_good[1,3]
 				th_dist = g_tho-t_tho-g_y
-				if((x_dist**2+y_dist**2)**0.5 < 0.1) and (abs(th_dist)<0.5):
+				if((x_dist**2+y_dist**2)**0.5 < 0.1):
 					print("Meet sanity criteria")
 					self.ref_marks[test_rm_mid] = test_rm
 					break

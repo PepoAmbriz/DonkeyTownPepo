@@ -44,28 +44,32 @@ class AsinusCar():
         self.w = 0
         self.s = 0
         #DDR dimensions
-        self.R = 0.032 #wheel radius
-        self.L = 0.135 #axis length
+        self.R = 0.03 #wheel radius
+        self.L = 0.125 #axis length
         self.pub_speed = rospy.Publisher("/asinus_cars/"+str(car_id)+"/motors_driver", MotorsSpeed,
                                          queue_size=1, tcp_nodelay=True)
-        self.sub_odom = rospy.Subscriber("/fake_gps/ego_pose_raw/"+str(car_id),PCS,odom_callback,queue_size=1)
+        #self.sub_odom = rospy.Subscriber("/fake_gps/ego_pose_raw/"+str(car_id),PCS,odom_callback,queue_size=1)
+        self.sub_odom = rospy.Subscriber("/asinus_cars/"+str(car_id)+"/filtered_pose",PCS,odom_callback,queue_size=1)
         self.sub_obs = rospy.Subscriber("/sensors/obstacles",PointCloud,obs_callback, queue_size=1)
     def publish_steer(self,steering): #DDR angular speed.
         self.w = steering
     def publish_speed(self,speed): #DDR longitudinal speed.
-        self.s = speed
-	if(speed==0):
-	    self.stop()
-	    return
+    	if(speed==0):
+    	    self.stop()
+    	    return
         #convert (w,s) -> (ul,ur) [rpm]
-        ur = (2*self.s+self.L*self.w)/(2*self.R)*(9.549296) #9.5492 from rad/s to rpm
-        ul = (2*self.s-self.L*self.w)/(2*self.R)*(9.549296)
+        self.s = speed
+        ur = 9.549296*(2*self.s+self.L*self.w)/(2*self.R) #9.5492 from rad/s to rpm
+        ul = 9.549296*(2*self.s-self.L*self.w)/(2*self.R)
+        print(ul,ur)
         speed_msg = MotorsSpeed()
         speed_msg.leftMotor = ul
         speed_msg.rightMotor = ur
         self.pub_speed.publish(speed_msg)
     def stop(self):
-	speed_msg = MotorsSpeed()
-	speed_msg.leftMotor = 0
-	speed_msg.rightMotor = 0
-	self.pub_speed.publish(speed_msg)
+        self.s = 0
+        self.w = 0
+    	speed_msg = MotorsSpeed()
+    	speed_msg.leftMotor = 0
+    	speed_msg.rightMotor = 0
+    	self.pub_speed.publish(speed_msg)
