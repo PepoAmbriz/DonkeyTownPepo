@@ -5,32 +5,32 @@
 #define mLR 6
 #define intR 3
 #define intL 2
-#define ratio 75
+#define gear_ratio 700.0
 #define motorL 0
 #define motorR 1 
 #define Rratio 1.692
 #define NOPOWERBANK false
 #define DEBUG true
 
-float f[] = {0,0}; 
+int rev_cnt[] = {0,0}; 
+int rev_cnt_tx[] = {0,0};
+float f[] = {0,0};
 float fs[] = {0,0};
-float fe_i[] = {0,0}; 
-volatile unsigned long time_m []= {0,0}; 
+float fe_i[] = {0,0};  
 volatile unsigned long last_time, cur_time;
 #if NOPOWERBANK
 const byte voltPin = A6; 
 float volt = 0; 
 #endif
-int idlcnt[] = {0,0}; 
 
 union recvData{
   byte bdata[8]; 
-  float fdata[2]; 
+  float fdata[2]; //left_revs, right_revs
 }rData; 
 
 union sendData{
   byte bdata[12];
-  float fdata[3]; 
+  float fdata[3]; //left_cnt, rigth_cnt, volt
 }sData;  
 
 void setup() {
@@ -52,28 +52,26 @@ void setup() {
   
   last_time = micros();
   cur_time  = last_time; 
-  time_m[0] = last_time;
-  time_m[1] = last_time;
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   cur_time = micros(); 
-  float dt = ((float)cur_time-(float)last_time)/1000000;
+  float dt = ((float)cur_time-(float)last_time)/1000000.0;
+  compute_f(motorL,dt);
+  compute_f(motorR,dt);
   fe_i[motorL] = set_speed(fs[motorL],dt,fe_i[motorL],motorL);
   fe_i[motorR] = set_speed(fs[motorR],dt,fe_i[motorR],motorR);
   #if DEBUG
-  Serial.print(f[motorL]); //Debug only
-  Serial.print(","); //Debug only
-  Serial.println(f[motorR]); //Debug only
+    Serial.print(f[motorL]);
+    Serial.print(",");
+    Serial.println(f[motorR]);
   #endif
   #if NOPOWERBANK
   volt = Rratio*5.0*(((float)analogRead(voltPin))/1023.0);  //Discarded if using powerbank
   #endif
-  if(idlcnt[motorL]++>(fs[motorL]<5.0)) f[motorL] = 0; 
-  if(idlcnt[motorR]++>(fs[motorR]<5.0)) f[motorR] = 0;  
   last_time = cur_time;  
-  delay(10); 
+  delay(20); 
 }
 
 void callbackL(){
@@ -83,22 +81,20 @@ void callbackR(){
   callback_m(motorR); 
 }
 void callback_m(byte motor){
-  volatile unsigned long auxtime; 
-  auxtime = micros(); 
-  f[motor] = (6000000/ratio)/((float)auxtime-(float)time_m[motor]); 
-  idlcnt[motor] = 0; 
-  time_m[motor] = auxtime; 
+  rev_cnt[motor]++;
+  rev_cnt_tx[motor]++;
 }
+
 int ctrl_pi(float p,float pi){
   return min(255,max(-255,5.0*p+4.0*pi)); 
 }
 
-float set_speed(float vs, float dt, float ei, byte motor){ 
+float set_speed(float vs, float dt, float ei, byte motor){
   if(vs==0.0){
     drive_motor(0,0,motor);
     return 0.0; 
   }
-  float this_f = f[motor]; 
+  float this_f = f[motor];
   float e = vs-this_f;  
   float aux_ei = ei+e*dt; 
   int duty_cycle = ctrl_pi(e,aux_ei); 
@@ -122,24 +118,7 @@ void drive_motor(int dutyF, int dutyR, byte motor){
   }
 }
 
-void sendData(float volt){
-  #if NOPOWERBANK
-  Serial.print(volt,4);
-  #else
-  Serial.print(5.0,4);
-  #endif
-  Serial.println(" V"); 
-  
-  Serial.print(f[motorL]);
-  Serial.println(" fL");
-  Serial.print(f[motorR]);
-  Serial.println(" fR");
-}
-
 void on_receive_callback(int a){
-  #if DEBUG
-  //Serial.println(a); //Debug only
-  #endif
   if(a==9){
     Wire.read();
     for(int i=0;i<8;++i)
@@ -151,20 +130,18 @@ void on_receive_callback(int a){
 }
 
 void on_request_callback(){
-  #if DEBUG
-  //Serial.println("Sending data"); 
-  #endif
-  sData.fdata[0] = (float)f[0]; 
+  sData.fdata[0] = (float)rev_cnt_tx[0]/gear_ratio;
+  rev_cnt_tx[0] = 0; 
+  sData.fdata[1] = (float)rev_cnt_tx[1]/gear_ratio;
+  rev_cnt_tx[1] = 0;
   //sData.fdata[0] = (float)fs[0];  //echo version
-  sData.fdata[1] = (float)f[1];
   //sData.fdata[1] = (float)fs[1];  //echo version
   #if NOPOWERBANK
   sData.fdata[2] = (float)volt; 
-  #else
-  //sData.fdata[2] = (float)5.0;  
+  #else 
   sData.fdata[2] = 89.1928309;  
   #endif
-  Wire.write(sData.bdata, 12); //not including voltage measure while using powerbank 
+  Wire.write(sData.bdata, 12); 
   Wire.begin(); 
 }
 
@@ -173,4 +150,9 @@ void stopMotors(void){
   analogWrite(mLR,0);
   analogWrite(mRF,0);
   analogWrite(mRR,0); 
+}
+
+void compute_f(byte motor, float dt){
+  f[motor] = 60.0*(float)rev_cnt[motor]/(gear_ratio*dt);
+  rev_cnt[motor] = 0;
 }
