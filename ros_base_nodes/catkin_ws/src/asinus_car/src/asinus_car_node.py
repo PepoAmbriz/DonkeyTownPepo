@@ -8,9 +8,10 @@ from time import time,sleep
 import numpy as np
 from math import cos,sin,pi
 from geometry_msgs.msg import PoseWithCovarianceStamped as PCS
+from geometry_msgs.msg import PoseStamped, Pose
 from tf.transformations import quaternion_from_euler, euler_from_quaternion
 
-from misc import SensorQ, subs_ang
+from misc import SensorQ, subs_ang, CameraModelPublisher, AttachedLinkPose
 #TODO: 
 #	[ ]: Add CAM messages
 
@@ -54,7 +55,8 @@ class DDR_KF(DDR):
 		Fu = 0.5*np.array([	[cc-kfuds*sc, 	cc+kfuds*sc],
 							[sc+kfuds*cc, 	sc-kfuds*cc],
 							[kfudth, 		-kfudth]])
-		Q = self.kQ*np.array([[dr,0],[0,dl]])
+		Q = self.kQ*np.array([[abs(dr),0],[0,abs(dl)]])
+		#Q = self.kQ*np.array([[dr**2,0],[0,dl**2]])
 		self.update(ds,dth)
 		self.P = np.matmul(Fx,np.matmul(self.P,np.transpose(Fx)))+\
 					np.matmul(Fu,np.matmul(Q,np.transpose(Fu)))
@@ -140,7 +142,30 @@ class AsinusCar:
 		self.KF.R = np.diag(self.gpsQ.var)
 		print("Correcting")
 		self.KF.correct(x,y,th)
-	
+
+def pose2msg(pose):
+	(x,y,z,roll,pitch,yaw) = pose
+	pose_msg = Pose()
+	pose_msg.pose.position.x = x
+	pose_msg.pose.position.y = y
+	pose_msg.pose.position.z = z
+	quat = quaternion_from_euler(roll,pitch,yaw)
+	pose_msg.pose.orientation.y = quat[1]
+	pose_msg.pose.orientation.z = quat[2]
+	pose_msg.pose.orientation.w = quat[3]
+	return pose_msg
+
+class AsinusCarCamPosePublisher:
+	def __init__(self, pose_file, topic):
+		self.rel_pose = AttachedLinkPose(pose_file)
+		self.pose_publisher = rospy.Publisher(topic,PoseStamped,queue_size=1)
+	def update_pose(self,base_pose):
+		abs_pose = self.rel_pose.getAbsPose(base_pose)
+		pose_msg = PoseStamped()
+		pose_msg.pose = pose2msg(abs_pose)
+		pose_msg.header.stamp = rospy.Time.now()
+		self.pose_publisher.publish(pose_msg)
+
 #Periodically publish speed (twist?, angular rpm is useful for debugging thou)
 #Kalman Filter
 class asinus_car_node: 
@@ -151,11 +176,13 @@ class asinus_car_node:
 		self.publish_rate = publish_rate
 		msg_stamp = rospy.Time.now()
 		self.init_msgs(msg_stamp)
-		self.measures_pub = rospy.Publisher('/asinus_cars/'+str(car_id)+'/motors_raw_data',MotorsState,queue_size=1)
-		self.posePub = rospy.Publisher("/asinus_cars/"+str(car_id)+"/filtered_pose",PCS,queue_size=1)
-		self.driver_sub = rospy.Subscriber('/asinus_cars/'+str(car_id)+'/motors_driver',MotorsSpeed, self.on_drive)
+		topic_bn = '/asinus_cars/'+str(car_id)
+		self.cam_pose_pub = AsinusCarCamPosePublisher('./camera_porperties/rel_cam_pose.yaml',topic_bn+'/camera/pose')
+		self.cam_info_pub = CameraModelPublisher(calibration_file,topic_bn+'/camera/camera_info')
+		self.measures_pub = rospy.Publisher(topic_bn+'/motors_raw_data',MotorsState,queue_size=1)
+		self.posePub = rospy.Publisher(topic_bn+"/filtered_pose",PCS,queue_size=1)
+		self.driver_sub = rospy.Subscriber(topic_bn+'/motors_driver',MotorsSpeed, self.on_drive)
 		self.gps_sub = rospy.Subscriber("/fake_gps/ego_pose_raw/"+str(car_id), PCS, self.on_gps)
-
 	def on_drive(self,speed_msg):
 		self.asinus_car.setSpeeds(speed_msg.leftMotor,speed_msg.rightMotor)
 	def on_gps(self,pcs_msg):
@@ -170,15 +197,12 @@ class asinus_car_node:
 		self.asinus_car.gps_correct(x,y,yaw,stamp)
 	def talker(self,rate):
 		rate = rospy.Rate(rate)
-		#Reduce publishing frequency.
 		while not rospy.is_shutdown():
 			stamp = rospy.Time.now()
 			self.asinus_car.update()
-			
 			self.motors_publish(stamp)
-			#publish estimation
 			self.pose_publish(stamp)
-			#Kalman FIlter (Another speed...)
+			self.cam_info_publish(stamp)
 			rate.sleep()
 	def motors_publish(self,stamp):
 		if (stamp-self.motor_st.header.stamp).to_sec() < (1/self.publish_rate):
@@ -192,15 +216,24 @@ class asinus_car_node:
 	def pose_publish(self,stamp):
 		if(stamp-self.pose_msg.header.stamp).to_sec() < (1/self.publish_rate):
 			return
+		pose = (self.asinus_car.KF.x, self.asinus_car.KF.y, 0.0,
+				0.0, 0.0, self.asinus_car.KF.th)
+
+		self.cam_pose_pub.update_pose(pose)
+
+		self.pose_msg.pose.pose = pose2msg(pose)
+		"""
 		self.pose_msg.pose.pose.position.x = self.asinus_car.KF.x
 		self.pose_msg.pose.pose.position.y = self.asinus_car.KF.y
 		yaw = self.asinus_car.KF.th
 		quat = quaternion_from_euler(0.0,0.0,yaw) #euler_to_quaternion([0.0,0.0,yaw])
-		#converting Pose2D cov matrix to full 6dof cov matrix.
 		self.pose_msg.pose.pose.orientation.x = quat[0]
 		self.pose_msg.pose.pose.orientation.y = quat[1]
 		self.pose_msg.pose.pose.orientation.z = quat[2]
 		self.pose_msg.pose.pose.orientation.w = quat[3]
+		"""
+
+		#converting Pose2D cov matrix to full 6dof cov matrix.
 		self.pose_msg.pose.covariance[0] = self.asinus_car.KF.P[0,0]
 		self.pose_msg.pose.covariance[1] = self.asinus_car.KF.P[0,1]
 		self.pose_msg.pose.covariance[5] = self.asinus_car.KF.P[0,2]
@@ -212,6 +245,10 @@ class asinus_car_node:
 		self.pose_msg.pose.covariance[35] = self.asinus_car.KF.P[2,2]
 		self.pose_msg.header.stamp = stamp
 		self.posePub.publish(self.pose_msg)
+	def cam_info_publish(self,stamp):
+		if(stamp-self.cam_info_pub.msg.header.stamp).to_sec() < 10.0:
+			return
+		self.cam_info_pub.publish(stamp)
 	def shutdown(self):
 		print("shutdown!")
 		rospy.sleep(1)
