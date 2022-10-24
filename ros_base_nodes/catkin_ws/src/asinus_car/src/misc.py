@@ -1,8 +1,7 @@
-import rospy 
+import rospy
 from sensor_msgs.msg import CameraInfo
-from geometry_msgs.msg import Pose as PoseMsg
 
-import yaml 
+import yaml
 import os
 from collections import deque
 import numpy as np
@@ -53,17 +52,15 @@ def yaml2model(paramfile='calibration.yaml'):
 	return(mat,dist)
 
 def pose2homo(pose):
-	(x,y,x,roll,pitch,yaw) = pose
-	R = euler_matrix(roll, pitch, yaw, 'rxyz')
-	H = np.zeros((4,4))
-	H[0:3,0:3] = R
+	(x,y,z,roll,pitch,yaw) = pose
+	H = euler_matrix(roll, pitch, yaw, 'rxyz')
 	H[0,3] = x
 	H[1,3] = y
 	H[2,3] = z
 	return H
 
-def homo2pose(homo):
-	(roll, pitch, yaw) = euler_from_matrix(H[0:3,0:3], 'rxyz')
+def homo2pose(H):
+	(roll, pitch, yaw) = euler_from_matrix(H[0:3,0:3], 'sxyz')
 	(x, y, z, _) = H[:,3]
 	return(x,y,z,roll,pitch,yaw)
 
@@ -72,12 +69,12 @@ def yaml2pose(paramfile='pose.yaml'):
 	paramfile = path+'/'+paramfile
 	with open(paramfile,'r') as f:
 		params = yaml.load(f)
-	roll = params('roll')
-	pitch = params('pitch')
-	yaw = params('yaw')
-	dx = params('dx')
-	dy = params('dy')
-	dz = params('dz')
+	roll = params['roll']
+	pitch = params['pitch']
+	yaw = params['yaw']
+	dx = params['dx']
+	dy = params['dy']
+	dz = params['dz']
 	return (dx,dy,dz,roll,pitch,yaw)
 
 class CameraModelPublisher: #Uncomplete, but costume-made for my needs so far
@@ -96,5 +93,6 @@ class AttachedLinkPose:
 		pose = yaml2pose(pose_file)
 		self.relTransform = pose2homo(pose)
 	def getAbsPose(self, baseLinkPose):
-		H = np.matmul(baseLinkPose,self.relTransform)
+		baseLinkTransform = pose2homo(baseLinkPose)
+		H = np.matmul(baseLinkTransform,self.relTransform)
 		return homo2pose(H)

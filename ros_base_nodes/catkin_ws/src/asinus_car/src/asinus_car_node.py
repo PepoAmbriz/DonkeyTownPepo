@@ -145,25 +145,27 @@ class AsinusCar:
 def pose2msg(pose):
 	(x,y,z,roll,pitch,yaw) = pose
 	pose_msg = Pose()
-	pose_msg.pose.position.x = x
-	pose_msg.pose.position.y = y
-	pose_msg.pose.position.z = z
+	pose_msg.position.x = x
+	pose_msg.position.y = y
+	pose_msg.position.z = z
 	quat = quaternion_from_euler(roll,pitch,yaw)
-	pose_msg.pose.orientation.y = quat[1]
-	pose_msg.pose.orientation.z = quat[2]
-	pose_msg.pose.orientation.w = quat[3]
+	pose_msg.orientation.x = quat[0]
+	pose_msg.orientation.y = quat[1]
+	pose_msg.orientation.z = quat[2]
+	pose_msg.orientation.w = quat[3]
 	return pose_msg
 
 class AsinusCarCamPosePublisher:
 	def __init__(self, pose_file, topic):
 		self.rel_pose = AttachedLinkPose(pose_file)
 		self.pose_publisher = rospy.Publisher(topic,PoseStamped,queue_size=1)
+		self.pose_msg = PoseStamped()
+		self.pose_msg.header.frame_id = "map"
 	def update_pose(self,base_pose):
 		abs_pose = self.rel_pose.getAbsPose(base_pose)
-		pose_msg = PoseStamped()
-		pose_msg.pose = pose2msg(abs_pose)
-		pose_msg.header.stamp = rospy.Time.now()
-		self.pose_publisher.publish(pose_msg)
+		self.pose_msg.pose = pose2msg(abs_pose)
+		self.pose_msg.header.stamp = rospy.Time.now()
+		self.pose_publisher.publish(self.pose_msg)
 
 #Periodically publish speed (twist?, angular rpm is useful for debugging thou)
 #Kalman Filter
@@ -176,8 +178,8 @@ class asinus_car_node:
 		msg_stamp = rospy.Time.now()
 		self.init_msgs(msg_stamp)
 		topic_bn = '/asinus_cars/'+str(car_id)
-		self.cam_pose_pub = AsinusCarCamPosePublisher('./camera_porperties/rel_cam_pose.yaml',topic_bn+'/camera/pose')
-		self.cam_info_pub = CameraModelPublisher(calibration_file,topic_bn+'/camera/camera_info')
+		self.cam_pose_pub = AsinusCarCamPosePublisher('camera_properties/rel_cam_pose.yaml',topic_bn+'/camera/pose')
+		self.cam_info_pub = CameraModelPublisher('camera_properties/example_calib_params.yaml',topic_bn+'/camera/camera_info')
 		self.measures_pub = rospy.Publisher(topic_bn+'/motors_raw_data',MotorsState,queue_size=1)
 		self.posePub = rospy.Publisher(topic_bn+"/filtered_pose",PCS,queue_size=1)
 		self.driver_sub = rospy.Subscriber(topic_bn+'/motors_driver',MotorsSpeed, self.on_drive)
