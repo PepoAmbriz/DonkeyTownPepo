@@ -28,11 +28,11 @@ class DDR(object):
 #Kalman filter
 #https://www.cs.princeton.edu/courses/archive/fall11/cos495/COS495-Lecture17-EKFLocalization.pdf
 class DDR_KF(DDR):
-	def __init__(self,q0,p0=10.0,R=np.eye(3),kQ=0.01):
+	def __init__(self,q0,p0=10.0,R=np.eye(3),kQ=0.1):
 		super(DDR_KF,self).__init__(q0)
 		self.p0 = p0
 		self.P = p0*np.eye(3)
-		self.R = 0.1*R
+		self.R = R
 		self.kQ = kQ #Constant gain for moel's covariance matrix
 		self.H = np.eye(3) #As it is.
 		self.enabled = False #Shall be False in prod.
@@ -55,8 +55,8 @@ class DDR_KF(DDR):
 		Fu = 0.5*np.array([	[cc-kfuds*sc, 	cc+kfuds*sc],
 							[sc+kfuds*cc, 	sc-kfuds*cc],
 							[kfudth, 		-kfudth]])
-		Q = self.kQ*np.array([[abs(dr),0],[0,abs(dl)]])
-		#Q = self.kQ*np.array([[dr**2,0],[0,dl**2]])
+		#Q = self.kQ*np.array([abs(dr),0],[0,abs(dl)]])
+		Q = self.kQ*np.array([[dr**2,0],[0,dl**2]])
 		self.update(ds,dth)
 		self.P = np.matmul(Fx,np.matmul(self.P,np.transpose(Fx)))+\
 					np.matmul(Fu,np.matmul(Q,np.transpose(Fu)))
@@ -100,8 +100,8 @@ class AsinusCar:
 		self.req_rpm = np.zeros(2)
 		self.volt = 5.0
 		self.last_time = time()
-		R = np.array([[0.2,0.0,0.0],[0.0,0.2,0.0],[0.0,0.0,0.4]])
-		self.KF = DDR_KF([0.0,0.0,0.0]) #Init at (x=0.0, y=-0.0, th=0.0) Just to give it an initial value.
+		R = np.array([[0.001,0.0,0.0],[0.0,0.01,0.0],[0.0,0.0,0.05]])
+		self.KF = DDR_KF([0.0,0.0,0.0], R=R) #Init at (x=0.0, y=-0.0, th=0.0) Just to give it an initial value.
 		self.gpsQ =  SensorQ(width=3,depth=5,timeout=2) #data sensor queue for gps data filtering.
 	def setSpeeds(self,rpm_l,rpm_r):
 		self.req_rpm = np.array([rpm_l,rpm_r])
@@ -126,7 +126,7 @@ class AsinusCar:
 		sense_data = [x,y,th]
 		self.gpsQ.push(sense_data,stamp)
 		#gps data sanity check
-		if self.gpsQ.get_depth() < 2:
+		if self.gpsQ.get_depth() < 3:
 			print("Returning due lack of data")
 			return
 		for mean,std,data in zip(self.gpsQ.mean,np.sqrt(self.gpsQ.var),sense_data): 
@@ -138,8 +138,7 @@ class AsinusCar:
 			print("Reinitializing")
 			self.KF.reinitialize(sense_data)
 			return
-		#self.KF.R = np.diag(self.gpsQ.var**0.25) #Worked, but why?
-		self.KF.R = np.diag(self.gpsQ.var)
+		#self.KF.R = np.diag(self.gpsQ.var)
 		print("Correcting")
 		self.KF.correct(x,y,th)
 
