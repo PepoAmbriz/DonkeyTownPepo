@@ -166,6 +166,7 @@ class AsinusCarCamPosePublisher:
 		self.pose_msg.pose = pose2msg(abs_pose)
 		self.pose_msg.header.stamp = rospy.Time.now()
 		self.pose_publisher.publish(self.pose_msg)
+	#TODO: add car's covariance for sanity checking purposes
 
 #Periodically publish speed (twist?, angular rpm is useful for debugging thou)
 #Kalman Filter
