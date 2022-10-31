@@ -10,7 +10,7 @@ from std_msgs.msg import Int16
 import tf
 import cv2 
 from auto_model import get_AutoModel
-         
+import v2x         
 #TODO: 
 #   -Enhance vector matrix selection. 
 #   -Modify inhouse desired path to be reliable for car-like robots. How to draw curves in inkspace? Drawing curves separately splits svg path. 
@@ -72,6 +72,10 @@ class VectorfieldController(MapConfig):
         else:
             self.matrix = self.matrix_nlane_2
             self.rmatrix = self.matrix_lane_2
+
+        self.myCAM = v2x.CAMPublisher(car_id)
+        self.extCAM = v2x.CAMSubscriber(car_id)
+
         rospy.on_shutdown(self.shutdown)
 
         self.shutdown_ = False
@@ -143,6 +147,11 @@ class VectorfieldController(MapConfig):
 
         if not self.shutdown_:
             self.model_car.publish_speed(speed)
+
+        self.myCAM.set(pose=[self.x,self.y,yaw], speed=self.speed_value,   
+                        lane=self.lane, drive_direction=True,       
+                        heading=angle, lane_change=((rospy.Time.now()-self.last_lane_change).to_sec()<10.0))
+        self.myCAM.publish()
 
     def shutdown(self):
         print("shutdown!")
