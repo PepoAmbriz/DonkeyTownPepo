@@ -8,7 +8,7 @@ class AsinusMotors:
 		self.min_rpm = 0
 		self.max_rpm = 80
 		self.i2c = pylibi2c.I2CDevice(i2cbus, i2caddr)
-		self.addr = i2caddr	
+		self.addr = i2caddr
 	def getMeasures(self): 
 		bdata = self.i2c.ioctl_read(0x0,12)
 		fdata = struct.unpack('3f',bdata)
@@ -17,6 +17,11 @@ class AsinusMotors:
 		speed_l = max(0.0,min(80.0,vels[0]))
 		speed_r = max(0.0,min(80.0,vels[1]))
 		blist = bytes(struct.pack('ff',speed_l,speed_r))
+		size = self.i2c.write(0x40044000,blist)
+	def setGains(self,gains):
+		kp = max(0,min(255,int(gains[0]*10)))
+		ki = max(0,min(255,int(gains[1]*10)))
+		blist = bytes(struct.pack('BB',kp,ki))
 		size = self.i2c.write(0x40044000,blist)
 	def stop(self):
 		self.setSpeeds([0.0,0.0])
