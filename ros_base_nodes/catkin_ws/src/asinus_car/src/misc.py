@@ -79,7 +79,7 @@ def yaml2pose(paramfile='pose.yaml'):
 
 class CameraModelPublisher: #Uncomplete, but costume-made for my needs so far
 	def __init__(self,paramfile,topic="/camera/camera_info"): 
-		self.publisher = rospy.Publisher(topic,CameraInfo,queue_size=1)
+		self.publisher = rospy.Publisher(topic,CameraInfo,queue_size=1,latch=True)
 		(mat,dist) = yaml2model(paramfile)
 		self.msg = CameraInfo()
 		self.msg.D = dist.flatten() 
