@@ -96,6 +96,7 @@ class AsinusCar:
 		self.gear_corr = gear_corr #How much is the asinus car actually faster?
 		self.motors = motors()
 		self.motors.stop()
+		#self.motors.setGains([5.0,4.0])
 		self.cur_rpm = np.zeros(2)
 		self.req_rpm = np.zeros(2)
 		self.volt = 5.0
