@@ -10,7 +10,7 @@
 #define motorR 1 
 #define Rratio 1.692
 #define NOPOWERBANK false
-#define DEBUG true
+#define DEBUG false
 
 int rev_cnt[] = {0,0}; 
 int rev_cnt_tx[] = {0,0};
@@ -22,6 +22,9 @@ volatile unsigned long last_time, cur_time;
 const byte voltPin = A6; 
 float volt = 0; 
 #endif
+
+float kp = 5.0;
+float ki = 4.0;
 
 union recvData{
   byte bdata[8]; 
@@ -63,9 +66,9 @@ void loop() {
   fe_i[motorL] = set_speed(fs[motorL],dt,fe_i[motorL],motorL);
   fe_i[motorR] = set_speed(fs[motorR],dt,fe_i[motorR],motorR);
   #if DEBUG
-    Serial.print(f[motorL]);
-    Serial.print(",");
-    Serial.println(f[motorR]);
+   Serial.print(f[motorL]);
+   Serial.print(",");
+   Serial.println(f[motorR]);
   #endif
   #if NOPOWERBANK
   volt = Rratio*5.0*(((float)analogRead(voltPin))/1023.0);  //Discarded if using powerbank
@@ -86,7 +89,7 @@ void callback_m(byte motor){
 }
 
 int ctrl_pi(float p,float pi){
-  return min(255,max(-255,5.0*p+4.0*pi)); 
+  return min(255,max(-255,kp*p+ki*pi)); 
 }
 
 float set_speed(float vs, float dt, float ei, byte motor){
@@ -119,12 +122,31 @@ void drive_motor(int dutyF, int dutyR, byte motor){
 }
 
 void on_receive_callback(int a){
+  if(a==3){
+    byte bdata[3];
+    for(int i=0; i<3;i++)
+      bdata[i] = Wire.read();
+    kp = (float)bdata[1]/10.0;
+    ki = (float)bdata[2]/10.0;
+    #if DEBUG
+    Serial.println("Gains");
+    Serial.print(kp);
+    Serial.print(", ");
+    Serial.println(ki);
+    #endif
+  }
   if(a==9){
     Wire.read();
     for(int i=0;i<8;++i)
       rData.bdata[i] = Wire.read(); 
     fs[motorL] = rData.fdata[motorL]; 
     fs[motorR] = rData.fdata[motorR];
+    #if DEBUG
+    Serial.println("fs: ");
+    Serial.print(fs[motorL]);
+    Serial.print(", ");
+    Serial.println(fs[motorR]);
+    #endif
   }  
   Wire.begin(); 
 }
