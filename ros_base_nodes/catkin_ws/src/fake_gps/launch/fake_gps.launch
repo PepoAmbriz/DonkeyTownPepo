@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="upcam_id" default="0"/>
+	<arg name="cam_port" default="0"/>
+	<arg name="debug_lvl" default="0"/>
+	<arg name="calib_file" default="calibration_files/calibration.yaml"/>
+	
+	<node name="fake_gps" pkg="fake_gps" type="multicam_fake_gps.py">
+		<param name="upcam_id" value="$(arg upcam_id)"/>
+		<param name="cam_port" value="$(arg cam_port)"/>
+		<param name="debug_lvl" value="$(arg debug_lvl)"/>
+		<param name="calib_file" value="$(arg calib_file)"/>
+	</node>
+</launch>
