@@ -28,7 +28,7 @@ class DDR(object):
 #Kalman filter
 #https://www.cs.princeton.edu/courses/archive/fall11/cos495/COS495-Lecture17-EKFLocalization.pdf
 class DDR_KF(DDR):
-	def __init__(self,q0,p0=10.0,R=np.eye(3),kQ=0.1):
+	def __init__(self,q0,p0=1.0,R=np.eye(3),kQ=2.0):
 		super(DDR_KF,self).__init__(q0)
 		self.p0 = p0
 		self.P = p0*np.eye(3)
@@ -96,12 +96,12 @@ class AsinusCar:
 		self.gear_corr = gear_corr #How much is the asinus car actually faster?
 		self.motors = motors()
 		self.motors.stop()
-		#self.motors.setGains([5.0,4.0])
+		self.motors.setGains([5.0,0.8])
 		self.cur_rpm = np.zeros(2)
 		self.req_rpm = np.zeros(2)
 		self.volt = 5.0
 		self.last_time = time()
-		R = np.array([[0.001,0.0,0.0],[0.0,0.01,0.0],[0.0,0.0,0.05]])
+		R = np.array([[0.005,0.0,0.0],[0.0,0.005,0.0],[0.0,0.0,1.0]])
 		self.KF = DDR_KF([0.0,0.0,0.0], R=R) #Init at (x=0.0, y=-0.0, th=0.0) Just to give it an initial value.
 		self.gpsQ =  SensorQ(width=3,depth=5,timeout=2) #data sensor queue for gps data filtering.
 	def setSpeeds(self,rpm_l,rpm_r):
@@ -130,10 +130,12 @@ class AsinusCar:
 		if self.gpsQ.get_depth() < 3:
 			print("Returning due lack of data")
 			return
+		cnt = 0
 		for mean,std,data in zip(self.gpsQ.mean,np.sqrt(self.gpsQ.var),sense_data): 
-			if (abs(data-mean) > 2.0*std):
+			if abs(data-mean) > 1.8*std:
 				print("Returning due to noise")
 				return
+			cnt += 1
 		#If passes gps data sanity check
 		if (not self.KF.enabled) or (not self.KF.sanity_check()):
 			print("Reinitializing")
@@ -181,7 +183,7 @@ class asinus_car_node:
 		self.init_msgs(msg_stamp)
 		topic_bn = '/asinus_cars/'+str(car_id)
 		self.cam_pose_pub = AsinusCarCamPosePublisher('camera_properties/rel_cam_pose.yaml',topic_bn+'/camera/pose')
-		self.cam_info_pub = CameraModelPublisher('camera_properties/example_calib_params.yaml',topic_bn+'/camera/camera_info')
+		self.cam_info_pub = CameraModelPublisher('camera_properties/calibration.yaml',topic_bn+'/camera/camera_info')
 		self.measures_pub = rospy.Publisher(topic_bn+'/motors_raw_data',MotorsState,queue_size=1)
 		self.posePub = rospy.Publisher(topic_bn+"/filtered_pose",PCS,queue_size=1)
 		self.driver_sub = rospy.Subscriber(topic_bn+'/motors_driver',MotorsSpeed, self.on_drive)
