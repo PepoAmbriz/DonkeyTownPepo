@@ -40,7 +40,7 @@ class MapConfig(object):
         #self.distance_lane_3 = np.load(path + 'matrix0cm_lane3.npy')        
         
 class VectorfieldController(MapConfig):
-    def __init__(self,map_name,lane,look_ahead,model_car,car_id,speed_value=0.2):
+    def __init__(self,map_name,lane,look_ahead,model_car,car_id,speed_value=0.22):
         print(map_name,lane,look_ahead,model_car,car_id,speed_value)
         super(VectorfieldController,self).__init__(map_name,look_ahead)
         
@@ -48,7 +48,7 @@ class VectorfieldController(MapConfig):
         if(model_car=='AutoModelMini'):    
             self.Ks = [4.0,0.0,0.2]
         else: #Asinus car steering control.
-            self.Ks = [3.0,0.0,2.0]
+            self.Ks = [5.0,0.0,3.0]
         callbacks = [self.callback,self.on_obs_detection] #ddr
         self.last_var = [0.0]
             
