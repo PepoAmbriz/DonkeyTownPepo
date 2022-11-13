@@ -1,7 +1,7 @@
-# DonkieTown (WIP)
+# DonkieTown 0.1
 ## A low-cost experimental platform for research on Intelligent Vehicles. 
 
-DonkieTown consists of one or more differential-drive robots called Asinus cars, a ground station, a localization system and a series of trusted techniques that easily allow the development of testbeds to implement and validate different strategies for collaborative autonomous driving, and study a variety of cases of study.
+DonkieTown consists of one or more differential-drive robots called Asinus cars, a base station, a localization system and a series of trusted techniques that easily allow the development of testbeds to implement and validate different strategies for collaborative autonomous driving, and study a variety of cases of study.
 
 ![DonkieTown status](/docs/images/DonkieTown.jpg)
 
@@ -15,8 +15,8 @@ In CIMAT-ZAC we use a router with a wireless local area network to avoid changin
 - Gateway:
    > 192.168.100.1
 
-### Agents static ips.
-- Ground Station and ROS Master:
+### Agents' static ips.
+- Base Station and ROS Master:
    > 192.168.100.100
 - Upper cameras:
    > 192.168.100.[100+ID]
@@ -40,7 +40,7 @@ And don't forget to source that file.
 
 # Simulator
 Multiple simulation scenarios are provided in the bring_up package.
-You can launch one scenario, e.g. in-house, with the following command.
+You can launch one scenario, e.g. in-house navigation, with the following command.
 ```
 roslaunch bring_up navigation_inhouse.launch
 ```
@@ -111,10 +111,6 @@ rm -rf /home/temp
 ```
 
 # TODO
-## Enabling fast wlan access configuration.
- - [x] Document wlan CIMAT_AUTOMINY. 
- - [x] (Troubleshooting) Document how to enable netplan with wlan0 static ip. 
- - [ ] Set all ips to static.
- - [x] (Troubleshooting) Document how to modify ssh login credentials.
- - [ ] Change all user_names and pswds to donkietown and elfmeter.
- - [ ] Replace ros2_tf lookup_transform with custom_made code.
+ - [] Create launch files.
+ - [] Get actual relative poses of Asinus Cars' cameras.
+ - [] Enable individual launch of obstacle detection.
