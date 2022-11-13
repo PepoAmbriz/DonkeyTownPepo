@@ -40,7 +40,7 @@ class MapConfig(object):
         #self.distance_lane_3 = np.load(path + 'matrix0cm_lane3.npy')        
         
 class VectorfieldController(MapConfig):
-    def __init__(self,map_name,lane,look_ahead,model_car,car_id,speed_value=0.22):
+    def __init__(self,map_name,lane,look_ahead,model_car,car_id,speed_value=0.15):
         print(map_name,lane,look_ahead,model_car,car_id,speed_value)
         super(VectorfieldController,self).__init__(map_name,look_ahead)
         
@@ -48,7 +48,7 @@ class VectorfieldController(MapConfig):
         if(model_car=='AutoModelMini'):    
             self.Ks = [4.0,0.0,0.2]
         else: #Asinus car steering control.
-            self.Ks = [5.0,0.0,3.0]
+            self.Ks = [4.0,0.0,0.5]
         callbacks = [self.callback,self.on_obs_detection] #ddr
         self.last_var = [0.0]
             
@@ -139,9 +139,10 @@ class VectorfieldController(MapConfig):
         else:
             speed = self.speed_value
 
-        gain = 1.0#+np.exp(-10.0*abs(steering))
+        gain = 1.0+2.0*np.exp(-10.0*abs(steering))
         if f_x > 0:
             speed = max(self.speed_value*gain, gain*(speed* ((np.pi / 3) / (abs(steering) + 1))))
+            print(speed)
 
         self.model_car.publish_steer(steering)
 
@@ -275,9 +276,10 @@ def main():
     look_ahead = rospy.get_param("~look_ahead","30cm")
     model_car = rospy.get_param("~model_car","AsinusCar")
     car_id = int(rospy.get_param("~car_id","7"))
+    speed = float(rospy.get_param("~speed","0.2"))
     try:
         VectorfieldController(map_name=map_name,lane=lane,look_ahead=look_ahead,
-                                model_car=model_car,car_id=car_id)
+                                model_car=model_car,car_id=car_id,speed_value=speed)
         rospy.spin()
     except rospy.ROSInterruptException:
         rospy.loginfo("VectorfieldController node terminated.")
