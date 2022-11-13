@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="car_id"/>
+
+	<remap from="/camera/pose" to="/asinus_cars/$(arg car_id)/camera/pose"/>
+	<remap from="/app/camera/rgb/camera_info" to="/asinus_cars/$(arg car_id)/camera/camera_info"/>
+	<remap from="/sensors/obstacles" to="/asinus_cars/$(arg car_id)/sensors/obstacles"/>
+	<remap from="/detectnet/detections" to="/asinus_cars/$(arg car_id)/detectnet/detections"/>
+
+	<node name="obstacle_localization" pkg="road_context" type="obstacle_localization_node.py">
+	</node>
+</launch>

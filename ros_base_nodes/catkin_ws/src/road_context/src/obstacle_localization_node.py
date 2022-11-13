@@ -13,7 +13,7 @@ class CameraPoseTopic:
 		self.msg = PoseStamped()
 		self.pose_sub = rospy.Subscriber(topic, PoseStamped, self.on_pose)
 	def on_pose(self, cam_pose_msg):
-		self.msg = camera_pose_msg
+		self.msg = cam_pose_msg
 	def get_pose(self):
 		return self.msg.pose
 
@@ -30,8 +30,8 @@ class obstacle_localization_node:
 
 		self.publisher = rospy.Publisher("/sensors/obstacles/",PointCloud,queue_size=1)
 
-		self.camera_pose = CameraPose() #Gazebo
-		#self.camera_pose = CameraPoseTopic("/camera/pose")
+		#self.camera_pose = CameraPose() #Gazebo
+		self.camera_pose = CameraPoseTopic("/camera/pose")
 		#self.obs_pose = ObstaclePose('osito_blanco_1') #get obstacle pose from gazebo
 		self.caminfo_sub = rospy.Subscriber("/app/camera/rgb/camera_info",CameraInfo,self.on_caminfo)
 		self.detectpts_sub = rospy.Subscriber("/detectnet/detections", Detection2DArray,self.on_pts)
@@ -62,6 +62,7 @@ class obstacle_localization_node:
 	def on_caminfo(self,msg): 
 		mat = np.reshape(msg.K,(3,3))
 		dist = np.asarray(msg.D)
+		rospy.logwarn(dist)
 		self.pl.set_cam_model(mat, dist)
 		self.ready = True
 		self.caminfo_sub.unregister()
