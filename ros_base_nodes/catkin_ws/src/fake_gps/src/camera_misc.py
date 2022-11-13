@@ -4,6 +4,13 @@ import yaml
 import os
 import numpy as np
 
+resolutions = {
+	"480p": (640,480),
+	"600p": (800,600),
+	"720p": (1280,720),
+	"1080p": (1920,1080)
+}
+
 def yaml2model(paramfile='calibration.yaml'): 
 	path = os.path.dirname(os.path.abspath(__file__))
 	paramfile = path+'/'+paramfile

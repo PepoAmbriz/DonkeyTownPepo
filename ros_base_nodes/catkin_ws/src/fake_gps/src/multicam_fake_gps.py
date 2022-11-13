@@ -3,7 +3,7 @@
 import rospy
 import cv2
 import numpy as np
-from camera_misc import CameraModel
+from camera_misc import CameraModel, resolutions
 from donkietown_msgs.msg import MarkerEdge, MarkerEdgeArray, Square
 import tf
 import tf2_ros
@@ -86,8 +86,8 @@ class MobileMarker(Marker):
 		self.posePub.publish(self.pose_msg) #Publish ego mark pose. 
 
 class fake_gps: 
-	def __init__(self, cam=0, cam_id=0, arucoDict=cv2.aruco.DICT_4X4_50, markerLen=0.1,
-					refids={'0'}, calib_f="calibration.yaml", debug_lvl=0): 
+	def __init__(self, cam=0, resolution="720p", cam_id=0, arucoDict=cv2.aruco.DICT_4X4_50, 
+					markerLen=0.1, refids={'0'}, calib_f="calibration.yaml", debug_lvl=0): 
 		self.arucoDict = cv2.aruco.Dictionary_get(arucoDict) 
 		self.markerLen = markerLen #square mark lenght 
 		self.cam_id = cam_id #To allow multiple cameras running
@@ -106,8 +106,9 @@ class fake_gps:
 		self.cam_model = CameraModel(paramfile=calib_f,topic=topic_bn+'/info')
 
 		self.cam = cv2.VideoCapture(cam)
-		self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-		self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+		res_w, res_h = resolutions[resolution]
+		self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, res_w)
+		self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, res_h)
 	def talker(self):
 		proc_thread = threading.Thread(target=self.img_proc_threaded)
 		proc_thread.daemon = True
@@ -206,9 +207,10 @@ def main():
 	cam_port = rospy.get_param("~cam_port", 0)
 	deb_lvl = rospy.get_param("~debug_lvl", 0)
 	cam_calib_file = rospy.get_param("~calib_file")
-
+	resolution = rospy.get_param("~resolution", "720p")
 	ref_marks = marks_offset.keys()
-	node = fake_gps(cam_port,cam_id=upper_cam_id,refids=ref_marks,calib_f=cam_calib_file,debug_lvl=deb_lvl) 
+	node = fake_gps(cam_port,resolution=resolution,cam_id=upper_cam_id,refids=ref_marks,
+						calib_f=cam_calib_file,debug_lvl=deb_lvl) 
 	try: 
 		node.talker()
 	except rospy.ROSInterruptException:
