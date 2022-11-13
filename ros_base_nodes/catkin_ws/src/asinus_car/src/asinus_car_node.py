@@ -272,10 +272,11 @@ class asinus_car_node:
 										 0.01,0.01,0,0,0,0.1]
 def main():
 	rospy.init_node('asinus_car_node',anonymous=True)
-	robot_id = rospy.get_param("~car_id") #Unique for each vehicle  
+	robot_id = rospy.get_param("~car_id") #Unique for each vehicle
+	rate = rospy.get_param("~rate", 100)
 	node = asinus_car_node(robot_id)
 	try:
-		node.talker(100)
+		node.talker(int(rate))
 	except rospy.ROSInterruptException:
 		rospy.loginfo("asinucar node terminated.")
 

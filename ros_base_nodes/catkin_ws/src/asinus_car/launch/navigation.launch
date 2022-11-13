@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="car_id"/>
+	<arg name="heart_rate" default="100"/>
+
+	<arg name="speed" default="0.2"/>
+	<arg name="map" default="cimat_reduced"/>
+	<arg name="look_ahead" default="30cm"/>
+	<arg name="lane" default="1"/>
+
+	<include file="$(find asinus_car)/launch/core.launch" ns="$(arg car_id)_core">
+		<arg name="car_id" value="$(arg car_id)"/>
+		<arg name="rate" value="$(arg heart_rate)"/>
+	</include>
+
+	<include file="$(find fub_navigation)/launch/navigation.launch" ns="$(arg car_id)_navigation">
+		<arg name="car_id" value="$(arg car_id)"/>
+		<arg name="model_car" value="AsinusCar"/>
+		<arg name="speed" value="$(arg speed)"/>
+		<arg name="map" value="$(arg map)"/>
+		<arg name="look_ahead" value="$(arg look_ahead)"/>
+		<arg name="lane" value="$(arg lane)"/>
+	</include>
+</launch>
