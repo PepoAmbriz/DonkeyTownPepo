@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="debug" default="True"/>
+
+	<remap from="/image_in" to="/sensors/global_camera/image_raw"/>
+
+	<node name="image_capture" pkg="global_view" type="img_capture.py">
+		<rosparam param="debug" subst_value="True">$(arg debug)</rosparam>
+	</node>
+</launch>
