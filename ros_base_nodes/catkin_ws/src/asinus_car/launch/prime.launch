@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="car_id"/>
+	<arg name="heart_rate" default="100"/>
+
+	<include file="$(find asinus_car)/launch/perception/obstacle_localization.launch" ns="asinus_car_$(arg car_id)"/>
+
+	<include file="$(find asinus_car)/launch/core.launch" ns="$(arg car_id)_core">
+		<arg name="car_id" value="$(arg car_id)"/>
+		<arg name="rate" value="$(arg heart_rate)"/>
+	</include>
+</launch>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="car_id"/>
+
+	<include file="$(find ros_deep_learning)/launch/donkienet.ros1.launch" ns="asinus_car_$(arg car_id)"/>
+
+	<include file="$(find road_context)/launch/obstacle_localization.launch" ns="asinus_car_$(arg car_id)/perception">
+		<arg name="car_id" value="$(arg car_id)"/>
+	</include>
+</launch>
