@@ -25,7 +25,7 @@ class V2X_node:
 	def __init__(self, car_id):
 		self.car_id = car_id
 		self.mem_CAM = shmsg.SharedCAM('selfCAM')
-		self.CAM_pub = rospy.Publisher('/v2x/pull',CAM,queue_size=1)	
+		self.CAM_pub = rospy.Publisher('/v2x/CAM/pull',CAM,queue_size=1)	
 		self.CAM_sub = CAMSubscriber(car_id,queue_size=5)
 	def talker(self,rate):
 		rate = rospy.Rate(rate)

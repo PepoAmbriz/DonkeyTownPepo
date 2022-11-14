@@ -6,7 +6,7 @@ class CAMPublisher:
 		cam = CAM()
 		cam.header.frame_id = str(car_id)
 		self.cam = cam
-		self.cam_pub = rospy.Publisher('/v2x/pull', CAM, queue_size=1)
+		self.cam_pub = rospy.Publisher('/v2x/CAM/pull', CAM, queue_size=1)
 	def set(self,pose,speed,lane,drive_direction,heading,lane_change):
 		self.cam.reference_pose.x = pose[0]
 		self.cam.reference_pose.y = pose[1]
@@ -24,7 +24,7 @@ class CAMSubscriber(object):
 	def __init__(self, car_id, queue_size=2):
 		self.car_id = int(car_id)
 		self.msg_cache = {}
-		self.cam_sub = rospy.Subscriber('/v2x/'+str(car_id)+'/rx', CAM, self.onCAM, queue_size=queue_size)
+		self.cam_sub = rospy.Subscriber('/v2x/CAM/'+str(car_id)+'/rx', CAM, self.onCAM, queue_size=queue_size)
 	def onCAM(self,cam):
 		car_id = int(cam.header.frame_id)
 		if car_id == self.car_id:

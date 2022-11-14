@@ -29,14 +29,14 @@ def bucketize(cams, rate=10, max_dist=3.0):
 
 class CAMTarget:
 	def __init__(self,target_id, tx_q_size=3):
-		self.publisher = rospy.Publisher('/v2x/'+str(target_id)+'/rx',CAM,queue_size=tx_q_size)
+		self.publisher = rospy.Publisher('/v2x/CAM/'+str(target_id)+'/rx',CAM,queue_size=tx_q_size)
 	def publish(self,cam):
 		self.publisher.publish(cam)
 		
 class VehicularNetwork:
 	def __init__(self,rx_q_size=5):
 		self.msg_cache = {}
-		self.receiver = rospy.Subscriber('/v2x/pull', CAM, self.onRx, queue_size=rx_q_size)
+		self.receiver = rospy.Subscriber('/v2x/CAM/pull', CAM, self.onRx, queue_size=rx_q_size)
 		self.tx_buffer = {}
 	def onRx(self,cam):
 		car_id = int(cam.header.frame_id)

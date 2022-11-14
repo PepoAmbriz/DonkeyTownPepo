@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="cluster_time_window" default="2.0"/>
+	<!-- 
+	Clustering algorithm:
+		DBSCAN
+			-eps: The maximum distance between two samples for one to be considered as in the neighborhood of the other. This is not a maximum bound on the distances of points within a cluster.
+			-cluster_min: The number of samples (or total weight) in a neighborhood for a point to be considered as a core point. This includes the point itself.
+	-->
+	<arg name="cluster_eps" default="0.1"/>
+	<arg name="cluster_min" default="5"/>
+	<arg name="cluster_rate" default="2.0"/>
+	<arg name="cluster_debug" default="False"/>
+
+	<node name="vehicular_network" pkg="vehicular_communication" type="vehicular_network_node.py"/>
+
+	<node name="sensor_sharing_network" pkg="vehicular_communication" type="sensor_sharing_node.py">
+		<param name="time_window" value="$(arg cluster_time_window)"/>
+		<param name="cluster_eps" value="$(arg cluster_eps)"/>
+		<param name="cluster_min" value="$(arg cluster_min)"/>
+		<param name="rate" value="$(arg cluster_rate)"/>
+		<param name="debug" value="$(arg cluster_debug)"/>
+	</node>
+
+	<include file="$(find map_publisher)/launch/robotics_lab.launch" ns="v2x"/>
+	
+</launch>
