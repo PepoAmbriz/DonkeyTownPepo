@@ -53,7 +53,7 @@ Please refer to the jetson_nano branch.
 # Upper cameras
 Please refer to the upper_cam branch.
 
-# Troubleshooting
+# Installation
 ## Setting static ip only for wlan
 This procedure has been proved for asinus cars and ours upper cameras. 
 1. Install netplan.
@@ -111,6 +111,6 @@ rm -rf /home/temp
 ```
 
 # TODO
- - [] Create launch files.
- - [] Get actual relative poses of Asinus Cars' cameras.
- - [] Enable individual launch of obstacle detection.
+ - [ ] Create launch files.
+ - [ ] Get actual relative poses of Asinus Cars' cameras.
+ - [ ] Enable individual launch of obstacle detection.

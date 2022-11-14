@@ -73,7 +73,7 @@ python setup.py install
 - Install the DonkieTown repo:
 First, install ros packages dependencies:
 ```
-sudo apt-get install ros-melodic-cv-bridge
+sudo apt-get install ros-melodic-cv-bridge ros-melodic-tf
 ```
 
 ```
