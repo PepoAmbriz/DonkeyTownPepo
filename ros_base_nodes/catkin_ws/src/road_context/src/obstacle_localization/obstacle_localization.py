@@ -46,7 +46,8 @@ class PixelLocator:
 		self.ped_r = 0.07
 		self.cam_mat = mat
 		self.cam_dist = dist
-		self.img_pose = euler_matrix(0.0,np.pi/2.0,-np.pi/2.0,'rxyz')
+		#self.img_pose = euler_matrix(0.0,np.pi/2.0,-np.pi/2.0,'rxyz')
+		self.img_pose = np.eye(4)
 	def set_cam_model(self, mat, dist):
 		self.cam_mat = mat
 		self.cam_dist = dist
