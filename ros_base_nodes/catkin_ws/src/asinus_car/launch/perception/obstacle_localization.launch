@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="car_id"/>
-	
+	<arg name="debug" default="false"/>	
+
 	<remap from="/asinus_cars/$(arg car_id)/detectnet/image_in" to="/asinus_cars/$(arg car_id)/video_source/raw"/>
-	<include file="$(find ros_deep_learning)/launch/donkienet.ros1.launch" ns="asinus_cars/$(arg car_id)"/>
+	<include file="$(find ros_deep_learning)/launch/donkienet.ros1.launch" ns="asinus_cars/$(arg car_id)">
+		<arg name="debug" value="$(arg debug)"/>
+	</include>
 
 	<include file="$(find road_context)/launch/obstacle_localization.launch" ns="asinus_car_$(arg car_id)/perception">
 		<arg name="car_id" value="$(arg car_id)"/>
