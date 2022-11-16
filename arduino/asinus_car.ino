@@ -10,7 +10,7 @@
 #define motorR 1 
 #define Rratio 1.692
 #define NOPOWERBANK false
-#define DEBUG false
+#define DEBUG true
 
 int rev_cnt[] = {0,0}; 
 int rev_cnt_tx[] = {0,0};
@@ -61,8 +61,6 @@ void loop() {
   // put your main code here, to run repeatedly:
   cur_time = micros(); 
   float dt = ((float)cur_time-(float)last_time)/1000000.0;
-  compute_f(motorL,dt);
-  compute_f(motorR,dt);
   fe_i[motorL] = set_speed(fs[motorL],dt,fe_i[motorL],motorL);
   fe_i[motorR] = set_speed(fs[motorR],dt,fe_i[motorR],motorR);
   #if DEBUG
@@ -74,7 +72,7 @@ void loop() {
   volt = Rratio*5.0*(((float)analogRead(voltPin))/1023.0);  //Discarded if using powerbank
   #endif
   last_time = cur_time;  
-  delay(20); 
+  delay(40); 
 }
 
 void callbackL(){
@@ -93,6 +91,7 @@ int ctrl_pi(float p,float pi){
 }
 
 float set_speed(float vs, float dt, float ei, byte motor){
+  compute_f(motor,dt);
   if(vs==0.0){
     drive_motor(0,0,motor);
     return 0.0; 
@@ -100,6 +99,11 @@ float set_speed(float vs, float dt, float ei, byte motor){
   float this_f = f[motor];
   float e = vs-this_f;  
   float aux_ei = ei+e*dt; 
+  if(aux_ei*ki > 255.0){
+    aux_ei = 255.0/ki;
+  } else if(aux_ei*ki < -255.0){
+    aux_ei = -255.0/ki; 
+  }
   int duty_cycle = ctrl_pi(e,aux_ei); 
   if(duty_cycle<0){ 
     drive_motor(0,0,motor);
