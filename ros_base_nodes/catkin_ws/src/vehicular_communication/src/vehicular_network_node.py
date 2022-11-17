@@ -56,8 +56,9 @@ class VehicularNetwork:
 def main(args):
 	rospy.init_node('vehicular_network', anonymous=True)
 	node = VehicularNetwork()
+	lat = rospy.get_param("~latency",0.1)
 	try:
-		node.talker(1)
+		node.talker(1/lat)
 	except rospy.ROSInterruptException:
 		pass
 

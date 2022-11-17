@@ -10,16 +10,22 @@
 	<arg name="cluster_eps" default="0.1"/>
 	<arg name="cluster_min" default="5"/>
 	<arg name="cluster_rate" default="2.0"/>
-	<arg name="cluster_debug" default="False"/>
 
-	<node name="vehicular_network" pkg="vehicular_communication" type="vehicular_network_node.py"/>
+	<arg name="debug" default="False"/>
+
+	<arg name="latency" default="0.1"/>
+
+
+	<node name="vehicular_network" pkg="vehicular_communication" type="vehicular_network_node.py">
+		<param name="latency" value="$(arg latency)"/>
+	</node>
 
 	<node name="sensor_sharing_network" pkg="vehicular_communication" type="sensor_sharing_node.py">
 		<param name="time_window" value="$(arg cluster_time_window)"/>
 		<param name="cluster_eps" value="$(arg cluster_eps)"/>
 		<param name="cluster_min" value="$(arg cluster_min)"/>
 		<param name="rate" value="$(arg cluster_rate)"/>
-		<param name="debug" value="$(arg cluster_debug)"/>
+		<param name="debug" value="$(arg debug)"/>
 	</node>
 
 	<include file="$(find map_publisher)/launch/robotics_lab.launch" ns="v2x"/>
