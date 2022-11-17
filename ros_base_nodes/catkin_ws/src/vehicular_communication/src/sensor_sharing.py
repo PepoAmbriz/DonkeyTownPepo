@@ -46,7 +46,7 @@ class SensorSharing:
 		clusters_sum = {}
 		clusters_size = {}
 		clusters = {}
-		for i in clustering.labels_:
+		for i in range(len(clustering.labels_)):
 			label = clustering.labels_[i]
 			if label == -1:
 				continue
