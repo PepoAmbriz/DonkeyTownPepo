@@ -36,7 +36,7 @@ class CAMTarget:
 class VehicularNetwork:
 	def __init__(self,rx_q_size=5):
 		self.msg_cache = {}
-		self.receiver = rospy.Subscriber('/v2x/CAM/pull', CAM, self.onRx, queue_size=rx_q_size)
+		self.receiver = rospy.Subscriber('/v2x/CAM/pool', CAM, self.onRx, queue_size=rx_q_size)
 		self.tx_buffer = {}
 	def onRx(self,cam):
 		car_id = int(cam.header.frame_id)

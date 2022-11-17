@@ -27,7 +27,7 @@ class SensorSharingNode(SensorSharing):
 
 		self.obs_pub = rospy.Publisher("/v2x/sensors/obstacles/filtered", PointCloud, queue_size=1)
 		if debug:
-			self.acc_pc_pub = rospy.Publisher("/v2x/sensors/obstacles/pull", PointCloud, queue_size=1)
+			self.acc_pc_pub = rospy.Publisher("/v2x/sensors/obstacles/pool", PointCloud, queue_size=1)
 
 	def on_ptcloud(self,pcmsg):
 		pts = [[pt.x,pt.y] for pt in pcmsg.points]

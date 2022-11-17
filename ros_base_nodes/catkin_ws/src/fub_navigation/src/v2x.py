@@ -6,7 +6,7 @@ class CAMPublisher:
 		cam = CAM()
 		cam.header.frame_id = str(car_id)
 		self.cam = cam
-		self.cam_pub = rospy.Publisher('/v2x/CAM/pull', CAM, queue_size=1)
+		self.cam_pub = rospy.Publisher('/v2x/CAM/pool', CAM, queue_size=1)
 	def set(self,pose,speed,lane,drive_direction,heading,lane_change):
 		self.cam.reference_pose.x = pose[0]
 		self.cam.reference_pose.y = pose[1]
