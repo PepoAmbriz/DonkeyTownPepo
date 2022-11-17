@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="car_id"/>
-	<arg name="rate" default="100"/>
+	<arg name="rate" default="25"/>
 
 	<node name="asinus_car_$(arg car_id)" pkg="asinus_car" type="asinus_car_node.py">
 		<param name="car_id" value="$(arg car_id)"/>

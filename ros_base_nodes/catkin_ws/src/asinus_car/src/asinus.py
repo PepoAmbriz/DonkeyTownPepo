@@ -6,7 +6,7 @@ import pylibi2c
 class AsinusMotors: 
 	def __init__(self,i2cbus='/dev/i2c-1',i2caddr=0x08):
 		self.min_rpm = 0
-		self.max_rpm = 100
+		self.max_rpm = 1000
 		self.i2c = pylibi2c.I2CDevice(i2cbus, i2caddr)
 		self.addr = i2caddr
 	def getMeasures(self): 
