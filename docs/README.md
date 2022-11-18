@@ -3,9 +3,53 @@
 
 DonkieTown consists of one or more differential-drive robots called Asinus cars, a base station, a localization system and a series of trusted techniques that easily allow the development of testbeds to implement and validate different strategies for collaborative autonomous driving, and study a variety of cases of study.
 
-![DonkieTown status](/docs/images/DonkieTown.jpg)
+[![DonkieTown status](/docs/images/DonkieTown.jpg)](https://youtube.com/playlist?list=PLO9tS78GvAmSHxlJAngOm7qDcSlMZyhZU)
 
-## Fast configuration.
+# How to use
+## Base Station
+It is highly recommended to use a personal computer such as a laptop or workstation as the Base Station. The Base Station plays as ROS Master and Vehicular Network Manager. In order to setup your computer as ros_master and source simulator-only and base-station-only nodes you shall source:
+```
+source <DT_PATH>/bs_setup.bash
+```
+Permanently,
+```
+sudo sh -c "echo 'source <DT_PATH>/bs_setup.bash' >> ~/.bashrc"
+```
+once it is done, `$DT_PATH` environment variable is set and you may be able to start launching Simulator nodes, Navigation nodes, and Vehicular Communication Nodes.
+
+### Vehicular communication node
+The following starts message handling and post-processing of shared data of pedestrians detected by all Asinus Cars.
+```
+roslaunch vehicular_communication network.launch
+```
+
+### Shared data postprocessing (standalone) node
+```
+roslaunch road_context obstacle_localization.launch
+```
+
+### Navigation (standalone) node
+It is recommended to use the base station for navigation controller since you could start it and finish it without login to the Asinus Car.
+```
+roslaunch fub_navigation navigation.launch car_id:=<marker_id>
+```
+
+## Simulator
+Multiple simulation scenarios are provided in the bring_up package.
+You can launch one scenario, e.g. in-house navigation, with the following command.
+```
+roslaunch bring_up navigation_inhouse.launch
+```
+![Simulator](/docs/images/driving_sim.jpg)
+
+## Asinus Cars
+Please refer to [the jetson_nano page](/docs/jetson_nano/README.md)
+![Asinus Car](/docs/images/AsinusCar.jpg)
+
+## Upper cameras
+Please refer to [the upper_cam page](/docs/upper_cam/README.md).
+
+# LAN configuration.
 In CIMAT-ZAC we use a router with a wireless local area network to avoid changing network configuration and ros environment variables for each computer whenever we need to relocate. 
 
 - SSID:
@@ -15,7 +59,7 @@ In CIMAT-ZAC we use a router with a wireless local area network to avoid changin
 - Gateway:
    > 192.168.100.1
 
-### Agents' static ips.
+## Agents' static ips.
 - Base Station and ROS Master:
    > 192.168.100.100
 - Upper cameras:
@@ -32,28 +76,13 @@ export DT_IP=[ID]
 And don't forget to source that file.
 
 
-### Agents SSH credentials.
+## Agents' SSH credentials.
 - user_name:
    > donkietown
 - password:
    > elfmeter
 
-# Simulator
-Multiple simulation scenarios are provided in the bring_up package.
-You can launch one scenario, e.g. in-house navigation, with the following command.
-```
-roslaunch bring_up navigation_inhouse.launch
-```
-![Simulator](/docs/images/driving_sim.jpg)
-
-# Asinus Cars
-Please refer to the jetson_nano branch.
-![Asinus Car](/docs/images/AsinusCar.jpg)
-
-# Upper cameras
-Please refer to the upper_cam branch.
-
-# Installation
+# Common installation instructions
 ## Setting static ip only for wlan
 This procedure has been proved for asinus cars and ours upper cameras. 
 1. Install netplan.
@@ -111,6 +140,4 @@ rm -rf /home/temp
 ```
 
 # TODO
- - [ ] Create launch files.
- - [ ] Get actual relative poses of Asinus Cars' cameras.
- - [ ] Enable individual launch of obstacle detection.
+ - [ ] Enable cooperative use case.
