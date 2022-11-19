@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>coop_fub_nav</name>
+  <name>cooperative_driving</name>
   <version>0.0.0</version>
-  <description>The coop_fub_nav package</description>
+  <description>The cooperative_driving package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/coop_fub_nav</url> -->
+  <!-- <url type="website">http://wiki.ros.org/cooperative_driving</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
