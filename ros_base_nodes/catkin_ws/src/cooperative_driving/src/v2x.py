@@ -1,13 +1,19 @@
 import rospy
 from donkietown_msgs.msg import CooperativeAwarenessMessage as CAM
 
+driving_states = {	'Drive': 0,
+					'LaneChangeGrant': 1,
+					'LaneChangeReq': 2,
+					'Stop': 3,
+					'Overtake': 4}
+
 class CAMPublisher:
 	def __init__(self, car_id):
 		cam = CAM()
 		cam.header.frame_id = str(car_id)
 		self.cam = cam
 		self.cam_pub = rospy.Publisher('/v2x/CAM/pool', CAM, queue_size=1)
-	def set(self,pose2D,speed,lane,drive_direction,heading,lane_change):
+	def set(self,pose2D=None,speed=None,lane=None,drive_direction=None,heading=None,driving_state=None):
 		if pose2D is not None:
 			self.cam.reference_pose = pose2D
 		if speed is not None:
@@ -18,8 +24,8 @@ class CAMPublisher:
 			self.cam.drive_direction = drive_direction
 		if heading is not None:
 			self.cam.heading = heading
-		if lane_change is not None:
-			self.cam.lane_change = lane_change
+		if driving_state is not None:
+			self.cam.driving_state = driving_state
 	def publish(self):
 		self.cam.header.stamp = rospy.Time.now()
 		self.cam_pub.publish(self.cam)

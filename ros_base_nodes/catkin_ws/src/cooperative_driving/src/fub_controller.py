@@ -1,31 +1,52 @@
+import sys
 import rospy
 import rospkg
 import cv2
 import math
 import numpy as np
 from tf.transformations import euler_from_quaternion
+sys.path.append(rospkg.RosPack().get_path('cooperative_driving')+'/scripts/')
+from path_parser import read_points
+from scipy.spatial import KDTree
+
+class PID:
+    def __init__(self,Kp,Ki,Kd):
+        self.Kp = Kp
+        self.Ki = Ki
+        self.Kd = Kd
+        self.last_time = rospy.Time.now()
+        self.integral_error = 0.0
+        self.last_e = 0.0
+    def control(self,star,current):
+        now = rospy.Time.now()
+        dt = (now-self.last_time).to_sec()
+        self.last_time = now
+
+        e = star-current
+        self.integral_error += e*dt
+        u = self.Kp*e+self.Ki*self.integral_error+self.Kd*(e-self.last_e)/dt
+        self.last_e = e
 
 class MapConfig(object):
     def __init__(self,map_name,look_ahead='50cm'): 
         rospack = rospkg.RosPack()
-        path = rospack.get_path('fub_navigation')+'/scripts/maps/'+map_name+'/'
+        path = rospack.get_path('cooperative_driving')+'/scripts/maps/'+map_name+'/'
         map_img = cv2.imread(path+'map.png')
         (h,w,l) = map_img.shape
         self.map_size_x = w  # cm
         self.map_size_y = h  # cm
         self.resolution = 1  #More than an argument, it's a parameter to meet. 
-
-       #Do not charge all of     them 
-
+        #[FIXME]: Please match correct matrices.
         self.matrix_lane_1 = np.load(path + 'matrix'+look_ahead+'_lane2.npy')
         self.matrix_lane_2 = np.load(path + 'matrix'+look_ahead+'_lane1.npy')
-        #self.matrix_lane_3 = np.load(path + 'matrix'+look_ahead+'_lane3.npy')
-        self.matrix_nlane_1 = np.load(path + 'matrix-'+look_ahead+'_lane2.npy')
-        self.matrix_nlane_2 = np.load(path + 'matrix-'+look_ahead+'_lane1.npy')
-        #self.matrix_nlane_3 = np.load(path + 'matrix-'+look_ahead+'_lane3.npy')
+
         self.distance_lane_1 = np.load(path + 'matrix0cm_lane2.npy')
         self.distance_lane_2 = np.load(path + 'matrix0cm_lane1.npy')
-        #self.distance_lane_3 = np.load(path + 'matrix0cm_lane3.npy')
+
+        xy = np.array(list(read_points(path+'new_map_loop1.txt')))
+        self.tree_lane1 = KDTree(xy)
+        xy = np.array(list(read_points(path+'new_map_loop2.txt')))
+        self.tree_lane2 = KDTree(xy)
 
 class VectorfieldController(MapConfig):
     def __init__(self,map_name,lane,look_ahead):
@@ -46,12 +67,14 @@ class VectorfieldController(MapConfig):
 
         if self.lane == 1:
             self.matrix = self.matrix_lane_1
-            self.rmatrix = self.matrix_nlane_1
+            self.tree = self.tree_lane1
         else:
-            self.matrix = self.matrix_nlane_2
-            self.rmatrix = self.matrix_lane_2
+            self.matrix = self.matrix_lane_2 #Please, fix this by renaming the file
+            self.tree = self.tree_lane2
 
-    def get_coords_from_vf(self,raw_x, raw_y, matrix):
+    def get_coords_from_vf(self,raw_x, raw_y, matrix=None):
+        if matrix is None:
+            matrix = self.matrix
         #To match vector field
         x = raw_x+self.map_size_x/200.0
         y = raw_y+self.map_size_y/200.0
@@ -116,7 +139,7 @@ class VectorfieldController(MapConfig):
         steering = 14.2857*(-np.sin(yaw)*nu1+np.cos(yaw)*nu2) #where 14.2857 = 1/mu, mu:eccentrecity. Taking mu=0.07
         return(speed,steering,None)
 
-    def steering_control(self, pose_msg, speed_value):
+    def pd_control(self, pose_msg, speed_value):
         dt = (pose_msg.header.stamp - self.last_time).to_sec()
         # 25hz
         if dt < 0.04:
@@ -147,15 +170,43 @@ class VectorfieldController(MapConfig):
         if f_x > 0:
             speed = max(speed_value*gain, gain*(speed* ((np.pi / 3) / (abs(steering) + 1))))
         return (speed,steering,angle)
-
+    def fuzzy_control(self, pose_msg, speed_value):
+        #FUTURE
+        pass
     def lane_change(self):
-        if (rospy.Time.now() - self.last_lane_change).to_sec() < 1.0:
+        if not self.lane_change_req:
             return
         if self.lane == 1:
             self.matrix = self.matrix_lane_2
+            self.tree = self.tree_lane2
             self.lane = 2
         else:
             self.matrix = self.matrix_lane_1
+            self.tree = self.tree_lane1
             self.lane = 1
         self.last_lane_change = rospy.Time.now()
         print("lane change")
+    def lane_change_req():
+        return (rospy.Time.now()-self.last_lane_change).to_sec()>1.0
+    def get_coords_from_car(self, pt):
+        return [pt.x-self.x, pt.y-self.y]
+    def get_coords_from_lanes(self, pt):
+        xm = pt.x+self.map_size_x/200.0
+        ym = pt.y+self.map_size_y/200.0
+        (xi, yi) = int(xm*(100/self.resolution)), int(ym*(100/self.resolution))
+        (xd1, yd1) = self.distance_lane_1[xi, yi, :]
+        (xd2, yd2) = self.distance_lane_2[xi, yi, :]
+        if self.lane == 1:
+            return([[xd1,yd1],[xd2,yd2]])
+        else:
+            return([[xd2,yd2],[xd1,yd1]])
+    def findNearestIndex(self,pt):
+        pt = np.asarray(pt)+np.array([self.map_size_x*self.resolution/200.0,
+                                        self.map_size_y*self.resolution/200.0])
+
+        dist,index = self.tree.query(pt)
+        return index
+    def getPathDistance(self,ptA,ptB):
+        indexA = self.findNearestIndex(ptA)
+        indexB = self.findNearestIndex(ptB)
+        return (indexB-indexA)*self.resolution/100.0
