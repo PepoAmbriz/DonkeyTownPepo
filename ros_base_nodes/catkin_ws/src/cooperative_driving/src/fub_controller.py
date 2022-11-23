@@ -26,7 +26,7 @@ class PID:
         self.integral_error += e*dt
         u = self.Kp*e+self.Ki*self.integral_error+self.Kd*(e-self.last_e)/dt
         self.last_e = e
-
+        return u
 class MapConfig(object):
     def __init__(self,map_name,look_ahead='50cm'): 
         rospack = rospkg.RosPack()
@@ -36,12 +36,14 @@ class MapConfig(object):
         self.map_size_x = w  # cm
         self.map_size_y = h  # cm
         self.resolution = 1  #More than an argument, it's a parameter to meet. 
-        #[FIXME]: Please match correct matrices.
-        self.matrix_lane_1 = np.load(path + 'matrix'+look_ahead+'_lane2.npy')
-        self.matrix_lane_2 = np.load(path + 'matrix'+look_ahead+'_lane1.npy')
+        #self.matrix_lane_1 = np.load(path + 'matrix'+look_ahead+'_lane1.npy')
+        self.matrix_lane_1 = np.load(path + 'matrix-'+look_ahead+'_lane1.npy')
+        #self.matrix_rlane_1 = np.load(path + 'matrix-'+look_ahead+'_lane1.npy')
+        self.matrix_lane_2 = np.load(path + 'matrix'+look_ahead+'_lane2.npy')
+        #self.matrix_rlane_2 = np.load(path + 'matrix-'+look_ahead+'_lane2.npy')
 
-        self.distance_lane_1 = np.load(path + 'matrix0cm_lane2.npy')
-        self.distance_lane_2 = np.load(path + 'matrix0cm_lane1.npy')
+        self.distance_lane_1 = np.load(path + 'matrix0cm_lane1.npy')
+        self.distance_lane_2 = np.load(path + 'matrix0cm_lane2.npy')
 
         xy = np.array(list(read_points(path+'new_map_loop1.txt')))
         self.tree_lane1 = KDTree(xy)
