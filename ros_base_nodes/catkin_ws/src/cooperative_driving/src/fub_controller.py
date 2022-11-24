@@ -37,7 +37,8 @@ class MapConfig(object):
         self.map_size_y = h  # cm
         self.resolution = 1  #More than an argument, it's a parameter to meet. 
         #self.matrix_lane_1 = np.load(path + 'matrix'+look_ahead+'_lane1.npy')
-        self.matrix_lane_1 = np.load(path + 'matrix-'+look_ahead+'_lane1.npy')
+        self.matrix_lane_1 = np.load(path + 'matrix-'+look_ahead+'_lane1.npy') #[FUTURE][FIXME]: Redraw svg files to avoid 
+                                                                                #having different directions.
         #self.matrix_rlane_1 = np.load(path + 'matrix-'+look_ahead+'_lane1.npy')
         self.matrix_lane_2 = np.load(path + 'matrix'+look_ahead+'_lane2.npy')
         #self.matrix_rlane_2 = np.load(path + 'matrix-'+look_ahead+'_lane2.npy')
@@ -45,10 +46,14 @@ class MapConfig(object):
         self.distance_lane_1 = np.load(path + 'matrix0cm_lane1.npy')
         self.distance_lane_2 = np.load(path + 'matrix0cm_lane2.npy')
 
-        xy = np.array(list(read_points(path+'new_map_loop1.txt')))
+        xy = np.array(list(read_points(path+'new_map_loop1.txt'))) \
+                -np.array([self.map_size_x,self.map_size_y])*self.resolution/200.0
+        xy = np.flip(xy,axis=0) #[FUTURE][FIXME]: Redraw svg files to avoid having different directions.
         self.tree_lane1 = KDTree(xy)
-        xy = np.array(list(read_points(path+'new_map_loop2.txt')))
+        xy = np.array(list(read_points(path+'new_map_loop2.txt'))) \
+                -np.array([self.map_size_x,self.map_size_y])*self.resolution/200.0
         self.tree_lane2 = KDTree(xy)
+        self.path_len = len(xy)
 
 class VectorfieldController(MapConfig):
     def __init__(self,map_name,lane,look_ahead):
@@ -62,7 +67,7 @@ class VectorfieldController(MapConfig):
 
         self.last_lane_change = rospy.Time.now()
         
-        self.Ks = [5.0,0.0,1.0]
+        self.Ks = [4.0,0.0,1.0]
         self.last_var = [0.0,0.0]
         self.last_time = rospy.Time.now()
         self.integral_error = 0.0
@@ -168,7 +173,7 @@ class VectorfieldController(MapConfig):
         else:
             speed = speed_value
 
-        gain = 1.0+1.0*np.exp(-10.0*abs(steering))
+        gain = 1.0#+1.0*np.exp(-10.0*abs(steering))
         if f_x > 0:
             speed = max(speed_value*gain, gain*(speed* ((np.pi / 3) / (abs(steering) + 1))))
         return (speed,steering,angle)
@@ -188,8 +193,8 @@ class VectorfieldController(MapConfig):
             self.lane = 1
         self.last_lane_change = rospy.Time.now()
         print("lane change")
-    def lane_change_req():
-        return (rospy.Time.now()-self.last_lane_change).to_sec()>1.0
+    def lane_change_req(self):
+        return (rospy.Time.now()-self.last_lane_change).to_sec()>5.0
     def get_coords_from_car(self, pt):
         return [pt.x-self.x, pt.y-self.y]
     def get_coords_from_lanes(self, pt):
@@ -203,12 +208,12 @@ class VectorfieldController(MapConfig):
         else:
             return([[xd2,yd2],[xd1,yd1]])
     def findNearestIndex(self,pt):
-        pt = np.asarray(pt)+np.array([self.map_size_x*self.resolution/200.0,
-                                        self.map_size_y*self.resolution/200.0])
-
-        dist,index = self.tree.query(pt)
+        dist,index = self.tree.query(np.asarray(pt))
         return index
+    def findNearest(self,pt):
+        i,d = self.findNearestIndex(pt)
+        return(self.tree.data[i])
     def getPathDistance(self,ptA,ptB):
         indexA = self.findNearestIndex(ptA)
         indexB = self.findNearestIndex(ptB)
-        return (indexB-indexA)*self.resolution/100.0
+        return ((indexB-indexA)%self.path_len)*self.resolution/100.0

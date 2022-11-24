@@ -4,4 +4,4 @@ float32 speed
 uint16 lane
 bool drive_direction
 float32 heading
-bool lane_change
+uint16 driving_state
