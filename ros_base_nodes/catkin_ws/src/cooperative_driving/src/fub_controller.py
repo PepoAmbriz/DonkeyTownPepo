@@ -181,7 +181,7 @@ class VectorfieldController(MapConfig):
         #FUTURE
         pass
     def lane_change(self):
-        if not self.lane_change_req:
+        if not self.lane_change_req():
             return
         if self.lane == 1:
             self.matrix = self.matrix_lane_2
@@ -213,7 +213,9 @@ class VectorfieldController(MapConfig):
     def findNearest(self,pt):
         i,d = self.findNearestIndex(pt)
         return(self.tree.data[i])
-    def getPathDistance(self,ptA,ptB):
+    def getPathDistance(self,ptA=None,ptB=None):
+        if ptA is None:
+            ptA = [self.x,self.y]
         indexA = self.findNearestIndex(ptA)
         indexB = self.findNearestIndex(ptB)
         return ((indexB-indexA)%self.path_len)*self.resolution/100.0

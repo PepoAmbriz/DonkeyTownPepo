@@ -31,19 +31,20 @@ class CooperativeDrivingNode(object):
 	def getCAMs(self):
 		return self.extCAM.msg_cache
 	def on_obstacle(self,msg):
-		print("Hello from on_obstacle")
 		pts = msg.points
 		blocked = [False,False] 
 		for pt in pts: 
 			pt_car = self.vectorField.get_coords_from_car(pt)
 			pt_lanes = self.vectorField.get_coords_from_lanes(pt)
-			dist_car = np.linalg.norm(pt_car)
-			if dist_car > 0.75:
+			#dist_car = np.linalg.norm(pt_car) #[FUTURE]  
+			dist_car = self.vectorField.getPathDistance(ptB=[pt.x,pt.y])
+			if dist_car > 0.5:
 				continue
 			dist_lane = np.linalg.norm(pt_lanes, axis=1)
+			rospy.logwarn(dist_lane)
 			rospy.logwarn(dist_car)
 			rospy.logwarn(dist_lane)
-			blocked |= dist_lane<0.2
+			blocked = dist_lane<0.1
 		rospy.logwarn(blocked)
 		self.lanes_blocked = blocked
 	def run(self): #Model car state variables estimation
@@ -54,8 +55,9 @@ class CooperativeDrivingNode(object):
 		self.s = twist.linear.x
 		self.w = twist.angular.z
 		if self.driving_state==v2x.driving_states['LaneChangeGrant']:
-			rospy.logwarn("LaneChange")
 			self.vectorField.lane_change()
+			self.lanes_blocked = list(reversed(self.lanes_blocked))
+			rospy.logwarn("LaneChange")
 		ctrl_s,ctrl_w,heading = self.vectorField.pd_control(pcs,self.speed_value)
 		if (ctrl_s is not None) and (not self.shutdown_) and (self.driving_state!=v2x.driving_states['Stop']):
 			self.car.drive(ctrl_s,ctrl_w)
@@ -107,10 +109,10 @@ class CooperativeConvoyNode(CooperativeDrivingNode):
 		myPose2d = pcs2pose2d(pcs)
 		min_dist = 3.0
 		CAMs = self.getCAMs()
-		while len(CAMs)!=1 and not rospy.is_shutdown(): #[FIXME]: Find a smarter way
+		while not rospy.is_shutdown(): #[FIXME]: Find a smarter way
 			self.myCAM.publish()
 			CAMs = self.getCAMs()
-			if len(CAMs)==0: #==1, ==2. #vehicles-1
+			if len(CAMs)==2: #==1, ==2. #vehicles-1
 				break
 			rospy.sleep(0.1)
 		for CAM in CAMs:
@@ -147,7 +149,7 @@ class CooperativeConvoyNode(CooperativeDrivingNode):
 		if self.driving_state==v2x.driving_states['LaneChangeReq']:
 			if self.vectorField.lane_change_req():
 				self.driving_state = v2x.driving_states['LaneChangeGrant']
-			return
+				return
 		if not self.lanes_blocked[0]:
 			self.driving_state = v2x.driving_states['Drive']
 			return
