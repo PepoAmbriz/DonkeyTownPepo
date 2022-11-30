@@ -8,7 +8,7 @@
 
 	<remap from="/sensors/obstacles" to="/v2x/sensors/obstacles/filtered"/>
 
-	<node name="cooperative_convoy_$(arg car_id)" pkg="cooperative_driving" type="cooperative_driving_node.py">
+	<node name="cooperative_convoy_$(arg car_id)" pkg="cooperative_driving" type="cooperative_convoy_node.py">
 		<param name="car_id" value="$(arg car_id)"/>
 		<param name="speed" value="$(arg speed)"/>
 		<param name="map_name" value="$(arg map)"/>

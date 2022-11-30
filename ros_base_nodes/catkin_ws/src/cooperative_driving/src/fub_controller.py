@@ -5,7 +5,7 @@ import cv2
 import math
 import numpy as np
 from tf.transformations import euler_from_quaternion
-sys.path.append(rospkg.RosPack().get_path('cooperative_driving')+'/scripts/')
+sys.path.append(rospkg.RosPack().get_path('fub_navigation')+'/scripts/')
 from path_parser import read_points
 from scipy.spatial import KDTree
 
@@ -30,7 +30,7 @@ class PID:
 class MapConfig(object):
     def __init__(self,map_name,look_ahead='50cm'): 
         rospack = rospkg.RosPack()
-        path = rospack.get_path('cooperative_driving')+'/scripts/maps/'+map_name+'/'
+        path = rospack.get_path('fub_navigation')+'/scripts/maps/'+map_name+'/'
         map_img = cv2.imread(path+'map.png')
         (h,w,l) = map_img.shape
         self.map_size_x = w  # cm
