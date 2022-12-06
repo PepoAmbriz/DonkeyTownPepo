@@ -1,4 +1,4 @@
-# DonkieTown 0.1
+# DonkieTown (Beta)
 ## A low-cost experimental platform for research on Intelligent Vehicles. 
 
 DonkieTown consists of one or more differential-drive robots called Asinus cars, a base station, a localization system and a series of trusted techniques that easily allow the development of testbeds to implement and validate different strategies for collaborative autonomous driving, and study a variety of cases of study.
@@ -140,4 +140,6 @@ rm -rf /home/temp
 ```
 
 # TODO
- - [ ] Enable cooperative use case.
+ - [ ] Label this version.
+ - [ ] test cooperative driving node clean-up.
+ - [ ] Prepare a demo video and add it.
