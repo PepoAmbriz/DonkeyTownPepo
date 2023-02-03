@@ -54,11 +54,14 @@ sudo sh -c "echo 'source ~/ros_deep_learning/catkin_ws/devel/setup.bash' >> ~/.b
 
 - [OPTIONAL] Build source of openCV 4.5.0 for jetson nano with cuda enabled as described in: https://qengineering.eu/install-opencv-4.5-on-jetson-nano.html
 
-- [Deprecated] Install scipy:
+- [OPTIONAL] Install scipy for python2:
 ```
 python -m pip install --upgrade pip
-python3 -m pip install --upgrade pip
 python -m pip install scipy
+```
+or 
+```
+sudo apt-get install python-scipy
 ```
 - [DEPRECATED] Install filterpy with pip
 ```
