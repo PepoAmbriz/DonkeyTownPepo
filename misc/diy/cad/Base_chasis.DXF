@@ -445,19 +445,19 @@ $SKPOLY
   9
 $TDCREATE
  40
-2459808.118216667
+2459811.891499213
   9
 $TDUCREATE
  40
-2459808.32655
+2459812.099832546
   9
 $TDUPDATE
  40
-2459808.118269213
+2459811.891528796
   9
 $TDUUPDATE
  40
-2459808.326602546
+2459812.099862129
   9
 $TDINDWG
  40
@@ -505,7 +505,7 @@ $SPLINESEGS
   9
 $HANDSEED
   5
-A1
+A3
   9
 $SURFTAB1
  70
@@ -885,7 +885,7 @@ $PSTYLEMODE
   9
 $FINGERPRINTGUID
   2
-{db399d91-823a-416c-8af3-4c68894d0e42}
+{8cd45b1e-5e26-483d-97fe-6f6d003b80d5}
   9
 $VERSIONGUID
   2
@@ -1501,7 +1501,7 @@ txt
   0
 STYLE
   5
-9D
+9F
 330
 3
 100
@@ -1915,6 +1915,32 @@ Continuous
 100
 AcDbCircle
  10
+-92.582
+ 20
+-7.75
+ 30
+0.0
+ 40
+1.299999999999983
+  0
+CIRCLE
+  5
+7A
+330
+1F
+100
+AcDbEntity
+  8
+0
+  6
+Continuous
+ 62
+     7
+370
+    25
+100
+AcDbCircle
+ 10
 -89.534
  20
 0.0
@@ -1925,7 +1951,7 @@ AcDbCircle
   0
 CIRCLE
   5
-7A
+7B
 330
 1F
 100
@@ -1951,7 +1977,7 @@ AcDbCircle
   0
 CIRCLE
   5
-7B
+7C
 330
 1F
 100
@@ -1968,32 +1994,6 @@ Continuous
 AcDbCircle
  10
 100.0
- 20
-35.79
- 30
-0.0
- 40
-1.299999999999997
-  0
-CIRCLE
-  5
-88
-330
-1F
-100
-AcDbEntity
-  8
-0
-  6
-Continuous
- 62
-     7
-370
-    25
-100
-AcDbCircle
- 10
-82.0
  20
 35.79
  30
@@ -2019,6 +2019,32 @@ Continuous
 100
 AcDbCircle
  10
+82.0
+ 20
+35.79
+ 30
+0.0
+ 40
+1.299999999999997
+  0
+CIRCLE
+  5
+8A
+330
+1F
+100
+AcDbEntity
+  8
+0
+  6
+Continuous
+ 62
+     7
+370
+    25
+100
+AcDbCircle
+ 10
 100.0
  20
 -35.79
@@ -2029,7 +2055,7 @@ AcDbCircle
   0
 CIRCLE
   5
-8A
+8B
 330
 1F
 100
@@ -2055,7 +2081,33 @@ AcDbCircle
   0
 CIRCLE
   5
-8B
+8C
+330
+1F
+100
+AcDbEntity
+  8
+0
+  6
+Continuous
+ 62
+     7
+370
+    25
+100
+AcDbCircle
+ 10
+-92.582
+ 20
+7.75
+ 30
+0.0
+ 40
+1.299999999999983
+  0
+CIRCLE
+  5
+8D
 330
 1F
 100
@@ -2081,7 +2133,7 @@ AcDbCircle
   0
 CIRCLE
   5
-8C
+8E
 330
 1F
 100
@@ -2107,66 +2159,6 @@ AcDbCircle
   0
 LINE
   5
-8D
-330
-1F
-100
-AcDbEntity
-  8
-0
-  6
-Continuous
- 62
-     7
-370
-    25
-100
-AcDbLine
- 10
-54.35
- 20
--9.4
- 30
-0.0
- 11
-54.35
- 21
-34.0
- 31
-0.0
-  0
-LINE
-  5
-8E
-330
-1F
-100
-AcDbEntity
-  8
-0
-  6
-Continuous
- 62
-     7
-370
-    25
-100
-AcDbLine
- 10
-54.35
- 20
-34.0
- 30
-0.0
- 11
--8.35
- 21
-34.0
- 31
-0.0
-  0
-LINE
-  5
 8F
 330
 1F
@@ -2183,15 +2175,15 @@ Continuous
 100
 AcDbLine
  10
--8.35
+54.35
  20
-34.0
+-9.4
  30
 0.0
  11
--8.35
+54.35
  21
--9.4
+34.0
  31
 0.0
   0
@@ -2213,6 +2205,66 @@ Continuous
 100
 AcDbLine
  10
+54.35
+ 20
+34.0
+ 30
+0.0
+ 11
+-8.35
+ 21
+34.0
+ 31
+0.0
+  0
+LINE
+  5
+91
+330
+1F
+100
+AcDbEntity
+  8
+0
+  6
+Continuous
+ 62
+     7
+370
+    25
+100
+AcDbLine
+ 10
+-8.35
+ 20
+34.0
+ 30
+0.0
+ 11
+-8.35
+ 21
+-9.4
+ 31
+0.0
+  0
+LINE
+  5
+92
+330
+1F
+100
+AcDbEntity
+  8
+0
+  6
+Continuous
+ 62
+     7
+370
+    25
+100
+AcDbLine
+ 10
 -8.35
  20
 -9.4
@@ -2227,7 +2279,7 @@ AcDbLine
   0
 LINE
   5
-91
+93
 330
 1F
 100
@@ -2257,7 +2309,7 @@ AcDbLine
   0
 LINE
   5
-92
+94
 330
 1F
 100
@@ -2287,7 +2339,7 @@ AcDbLine
   0
 LINE
   5
-93
+95
 330
 1F
 100
@@ -2317,7 +2369,7 @@ AcDbLine
   0
 LINE
   5
-94
+96
 330
 1F
 100
@@ -2347,7 +2399,7 @@ AcDbLine
   0
 LINE
   5
-95
+97
 330
 1F
 100
@@ -2377,7 +2429,7 @@ AcDbLine
   0
 LINE
   5
-96
+98
 330
 1F
 100
@@ -2407,7 +2459,7 @@ AcDbLine
   0
 LINE
   5
-97
+99
 330
 1F
 100
@@ -2437,7 +2489,7 @@ AcDbLine
   0
 LINE
   5
-98
+9A
 330
 1F
 100
@@ -2467,7 +2519,7 @@ AcDbLine
   0
 ARC
   5
-99
+9B
 330
 1F
 100
@@ -2499,7 +2551,7 @@ AcDbArc
   0
 ARC
   5
-9A
+9C
 330
 1F
 100
@@ -2531,7 +2583,7 @@ AcDbArc
   0
 ARC
   5
-9B
+9D
 330
 1F
 100
@@ -2563,7 +2615,7 @@ AcDbArc
   0
 ARC
   5
-9C
+9E
 330
 1F
 100
@@ -2595,7 +2647,7 @@ AcDbArc
   0
 MTEXT
   5
-9E
+A0
 330
 1F
 100
@@ -2633,7 +2685,7 @@ SLDTEXTSTYLE0
   0
 MTEXT
   5
-9F
+A1
 330
 1F
 100
@@ -2711,7 +2763,7 @@ ACAD_SCALELIST
   3
 DWGPROPS
 350
-A0
+A2
   0
 DICTIONARY
   5
@@ -2967,7 +3019,7 @@ D2
   0
 XRECORD
   5
-A0
+A2
 102
 {ACAD_REACTORS
 330
@@ -3019,9 +3071,9 @@ ab23_
  40
 0.0
  41
-2459808.32655
+2459812.099832546
  42
-2459808.326602546
+2459812.099862129
   1
 
  90
