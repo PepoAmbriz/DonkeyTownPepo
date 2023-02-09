@@ -25,6 +25,20 @@ rosdep update
 ```
 
 - Install ros_deep_learning nodes:
+Install Jetson-Inference as described in https://github.com/dusty-nv/ros_deep_learning#jetson-inference
+
+```
+cd ~
+sudo apt-get install git cmake
+git clone --recursive https://github.com/dusty-nv/jetson-inference
+cd jetson-inference
+mkdir build
+cd build
+cmake ../
+make -j$(nproc)
+sudo make install
+sudo ldconfig
+```
 install ros dependencies for ros_deep_learning nodes:
 ```
 sudo apt-get install ros-melodic-image-transport ros-melodic-vision-msgs
