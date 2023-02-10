@@ -31,7 +31,7 @@ class CooperativeConvoyNode(CooperativeDrivingNode):
 		while not rospy.is_shutdown(): #[FIXME]: Find a smarter way
 			self.myCAM.publish()
 			CAMs = self.getCAMs()
-			if len(CAMs)==2: #==1, ==2. #vehicles-1
+			if len(CAMs)==3: #==1, ==2. #vehicles-1
 				break
 			rospy.sleep(0.1)
 		for CAM in CAMs:
