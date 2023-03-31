@@ -17,24 +17,36 @@ sudo sh -c "echo 'source <DT_PATH>/bs_setup.bash' >> ~/.bashrc"
 ```
 once it is done, `$DT_PATH` environment variable is set and you may be able to start launching Simulator nodes, Navigation nodes, and Vehicular Communication Nodes.
 
-### Vehicular communication node
+### Asinus Car's `Core` node
+Core node is the essential node of the asinus cars. This node enables ros topics to enable the motors, odometry and an Extended Kalman Filter. If you only want to control the asinus car, this node is the go. Also, alongside fake_gps node(s), you may get an estimation of the robot's absolut position within the road.
+```
+roslaunch asinus_car core.launch car_id:=<marker_id>
+```
+
+### Asinus Car's `Prime` node
+In addition to `Core` features, `Prime` enables `DonkieNet` (a MobileNet+SSD detection network trained with a hand-labeled dataset of stuffed white donkeys).
+```
+roslaunch asinus_car prime.launch car_id:=<marker_id>
+```
+
+### Vehicular communication node [Base Station only]
 The following starts message handling and post-processing of shared data of pedestrians detected by all Asinus Cars.
 ```
 roslaunch vehicular_communication network.launch
 ```
 
-### Shared data postprocessing (standalone) node
+### Shared data postprocessing (standalone) node [Base Station only]
 ```
 roslaunch road_context obstacle_localization.launch
 ```
 
-### Navigation (standalone) node
+### Navigation (standalone) node [Asinus car or Base Station]
 It is recommended to use the base station for navigation controller since you could start it and finish it without login to the Asinus Car.
 ```
 roslaunch fub_navigation navigation.launch car_id:=<marker_id>
 ```
 
-## Simulator
+## Simulator [Base station only]
 Multiple simulation scenarios are provided in the bring_up package.
 You can launch one scenario, e.g. in-house navigation, with the following command.
 ```
@@ -81,6 +93,11 @@ And don't forget to source that file.
    > donkietown
 - password:
    > elfmeter
+
+# Contact
+For more information you may reach me out.
+> Emmanuel Larralde
+> ealarralde@gmail.com
 
 # Common installation instructions
 ## Setting static ip only for wlan
