@@ -52,7 +52,7 @@ You can launch one scenario, e.g. in-house navigation, with the following comman
 ```
 roslaunch bring_up navigation_inhouse.launch
 ```
-![Simulator](/docs/images/driving_sim.jpg)
+![Simulator](/docs/gifs/simulation.gif)
 
 ## Asinus Cars
 Please refer to [the jetson_nano page](/docs/jetson_nano/README.md)
