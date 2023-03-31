@@ -17,14 +17,14 @@ sudo sh -c "echo 'source <DT_PATH>/bs_setup.bash' >> ~/.bashrc"
 ```
 once it is done, `$DT_PATH` environment variable is set and you may be able to start launching Simulator nodes, Navigation nodes, and Vehicular Communication Nodes.
 
-### Asinus Car's `Core` node
+### Asinus Car's *Core* node
 Core node is the essential node of the asinus cars. This node enables ros topics to enable the motors, odometry and an Extended Kalman Filter. If you only want to control the asinus car, this node is the go. Also, alongside fake_gps node(s), you may get an estimation of the robot's absolut position within the road.
 ```
 roslaunch asinus_car core.launch car_id:=<marker_id>
 ```
 
-### Asinus Car's `Prime` node
-In addition to `Core` features, `Prime` enables `DonkieNet` (a MobileNet+SSD detection network trained with a hand-labeled dataset of stuffed white donkeys).
+### Asinus Car's *Prime* node
+In addition to *Core* features, *Prime* enables *DonkieNet* (a MobileNet+SSD detection network trained with a hand-labeled dataset of stuffed white donkeys).
 ```
 roslaunch asinus_car prime.launch car_id:=<marker_id>
 ```
