@@ -3,7 +3,7 @@
 
 DonkieTown consists of one or more differential-drive robots called Asinus cars, a base station, a localization system and a series of trusted techniques that easily allow the development of testbeds to implement and validate different strategies for collaborative autonomous driving, and study a variety of cases of study.
 
-[![DonkieTown status](/docs/images/DonkieTown.jpg)](https://youtube.com/playlist?list=PLO9tS78GvAmSHxlJAngOm7qDcSlMZyhZU)
+[![DonkieTown status](/docs/gifs/convoy.gif)]
 
 # How to use
 ## Base Station
