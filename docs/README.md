@@ -1,12 +1,21 @@
-# DonkieTown (Beta)
-## A low-cost experimental platform for research on Intelligent Vehicles. 
-
+# DonkieTown: a Low-cost Experimental Testbed for Research on Autonomous Cars
+## Abstract
 DonkieTown consists of one or more differential-drive robots called Asinus cars, a base station, a localization system and a series of trusted techniques that easily allow the development of testbeds to implement and validate different strategies for collaborative autonomous driving, and study a variety of cases of study.
+
+
+## [Future] Citation
+```bibtex
+@misc{
+
+}
+```
 
 ![DonkieTown status](/docs/gifs/platoon.gif)
 
+
+
 # How to use
-## Base Station
+## Base Station configuration
 It is highly recommended to use a personal computer such as a laptop or workstation as the Base Station. The Base Station plays as ROS Master and Vehicular Network Manager. In order to setup your computer as ros_master and source simulator-only and base-station-only nodes you shall source:
 ```
 source <DT_PATH>/bs_setup.bash
@@ -17,6 +26,22 @@ sudo sh -c "echo 'source <DT_PATH>/bs_setup.bash' >> ~/.bashrc"
 ```
 once it is done, `$DT_PATH` environment variable is set and you may be able to start launching Simulator nodes, Navigation nodes, and Vehicular Communication Nodes.
 
+## Simulator [Base station only]
+Multiple simulation scenarios are provided in the bring_up package.
+You can launch one scenario, e.g. in-house navigation, with the following command.
+```
+roslaunch bring_up navigation_inhouse.launch
+```
+![Simulator](/docs/gifs/simulation.gif)
+
+## Asinus Cars
+Please refer to [the jetson_nano page](/docs/jetson_nano/README.md)
+![Asinus Car](/docs/images/AsinusCar.jpg)
+
+## Upper cameras
+Please refer to [the upper_cam page](/docs/upper_cam/README.md).
+
+## ROS nodes and ROS launches
 ### Asinus Car's *Core* node
 Core node is the essential node of the asinus cars. This node enables ros topics to enable the motors, odometry and an Extended Kalman Filter. If you only want to control the asinus car, this node is the go. Also, alongside fake_gps node(s), you may get an estimation of the robot's absolut position within the road.
 ```
@@ -45,21 +70,6 @@ It is recommended to use the base station for navigation controller since you co
 ```
 roslaunch fub_navigation navigation.launch car_id:=<marker_id>
 ```
-
-## Simulator [Base station only]
-Multiple simulation scenarios are provided in the bring_up package.
-You can launch one scenario, e.g. in-house navigation, with the following command.
-```
-roslaunch bring_up navigation_inhouse.launch
-```
-![Simulator](/docs/gifs/simulation.gif)
-
-## Asinus Cars
-Please refer to [the jetson_nano page](/docs/jetson_nano/README.md)
-![Asinus Car](/docs/images/AsinusCar.jpg)
-
-## Upper cameras
-Please refer to [the upper_cam page](/docs/upper_cam/README.md).
 
 # LAN configuration.
 In CIMAT-ZAC we use a router with a wireless local area network to avoid changing network configuration and ros environment variables for each computer whenever we need to relocate. 
@@ -94,69 +104,9 @@ And don't forget to source that file.
 - password:
    > elfmeter
 
-# Contact
-For more information you may reach me out.
-> Emmanuel Larralde
-> ealarralde@gmail.com
+# Install instructions
+For instructions to install Asinus Cars' software refer to [the jetson_nano page](/docs/jetson_nano/README.md).
 
-# Common installation instructions
-## Setting static ip only for wlan
-This procedure has been proved for asinus cars and ours upper cameras. 
-1. Install netplan.
-```
-sudo apt-get install netplan.io
-```
-2. Identify your wireless network interface name.
-```
-ls /sys/class/net
-```
-Take a note of this interface name (wlan0). We will use it in next steps. 
+For instructions for the Upper Cameras (if you want to use other computers in addition to the Base Station) please refer to [the upper_cam page](/docs/upper_cam/README.md). 
 
-3. Add netplan file from main branch of DonkieTown repo.
-```
-sudo cp ./misc/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml
-``` 
-4. Generate the configuration.
-```
-sudo netplan generate
-```
-5. Apply the changes.
-```
-sudo netplan apply
-```
-
-### Changing login credentials.
-Change the password is as easy as type:
-```
-passwd
-```
-However, changing username is not as easy (but you could set your crdentials since the first boot).
-1. Create a temp user.
-```
-sudo -s
-useradd -G sudo temp
-passwd temp
-shutdown -h now
-```
-2. Log back in as the new "temp" user and elevate "temp" privileges.
-```
-ssh temp@192.168.100...
-sudo -s
-```
-3. Now, change username of the main account.
-```
-usermod -l donkietown <previous_user_name>
-shutdown -h now
-```
-4. Log back in as the donkietown user and delete out the temp user.
-```
-ssh donkietown@192.168.100...
-sudo -s
-deluser temp
-rm -rf /home/temp
-```
-
-# TODO
- - [ ] Label this version.
- - [ ] test cooperative driving node clean-up.
- - [ ] Prepare a demo video and add it.
+Base station
