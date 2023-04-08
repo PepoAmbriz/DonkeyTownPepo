@@ -5,7 +5,7 @@
 ![DonkieTown status](/docs/gifs/platoon.gif)
 
 #### [Future] Cite and contribute
-All developed source code, libraries and manufacturing files are released as open source under no license agreements. We expect every donkietown user to attribute our effort by citing *DonkieTown*.
+All developed source code, libraries and manufacturing files are released as open source under no license agreements. We expect every DonkieTown user to attribute our effort by citing *DonkieTown*.
 
 ```bibtex
 @inproceedings{
@@ -13,15 +13,15 @@ All developed source code, libraries and manufacturing files are released as ope
 }
 ```
 
-To contribute, you are free to create, manage and mantain side branches. By the moment direct git pushes to main branch and any forced git push are not allowed, however, you may submit GitHub pull requests and the [maintanance team](Maintenance) will review them and decide whether to merge it or not.
+To contribute, you are free to create, manage and maintain side branches. By the moment direct git pushes to main branch and any forced git push are not allowed, however, you may submit GitHub pull requests and the [maintenance team](Maintenance) will review them and decide whether to merge it or not.
 
 
-## Installation & Setup
-If you haven't installed and set up DonkieTown, visit [the installation page](/docs/INSTALL.md) for directions. You must get it donde before using DonkieTown. Once it is done, you may be able to start launching Simulator nodes, Navigation nodes, Localization Nodes, and Vehicular Communication Nodes. 
+## Installation & Set-up
+If you have not installed and set up DonkieTown, visit [the installation page](/docs/INSTALL.md) for directions. You must get it done before using DonkieTown. Once it is done, you may be able to start launching Simulator nodes, Navigation nodes, Localization Nodes, and Vehicular Communication Nodes. 
 
 ## Getting started.
 ### Primary ROS Nodes and ROS Launches
-ROS Nodes are processes capable of subscribing (or listening) and publishing (or talking) to ROS topics while ROS topics are named buses for the broadcasted data. ROS launch is a command that launches one or more nodes with both preset configuration and command-line arguments. The following ros launches are sufficient to use all DonkieTown functions. 
+ROS Nodes are processes capable of subscribing (or listening) and publishing (or talking) to ROS topics while ROS topics are named buses for the broadcasted data. ROS launch is a command that launches one or more nodes with both preset configuration and command-line arguments. The following ROS launches are sufficient to use all DonkieTown functions. 
 
 ### ROS nodes and ROS launches
 
@@ -34,7 +34,7 @@ roslaunch bring_up navigation_inhouse.launch
 ![Simulator](/docs/gifs/simulation.gif)
 
 #### Asinus Car's *Core* node
-Core node is the essential node of the asinus cars. This node enables ros topics to enable the motors, odometry and an Extended Kalman Filter. If you only want to control the asinus car, this node is the go. Also, alongside fake_gps node(s), you get an estimation of the robot's absolut position within the road.
+Core node is the essential node of the Asinus Cars. This node enables ROS topics to enable the motors, odometry and an Extended Kalman Filter. If you only want to control the Asinus Car, this node is the go. Also, alongside fake_gps node(s), you get an estimation of the robot's absolute position within the road.
 ```shell
 roslaunch asinus_car core.launch car_id:=<marker_id>
 ```
@@ -58,9 +58,9 @@ roslaunch fub_navigation navigation.launch car_id:=<marker_id>
 ```
 
 #### Indoors localization system node [Base Station or upper cameras]
-For this, you should calibrate each camera and recognize the port it is connected to. To calibrate a camera we recommend the [OpenCV's tutorial](https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html).
+For this, you should calibrate each camera and recognize the port it is connected to. To calibrate a camera, we recommend the [OpenCV's tutorial](https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html).
 
-To detect camera ports install and use v4l2 utils:
+To detect camera ports, install and use v4l2 utils:
 ```shell
 sudo apt-get install v4l-utils
 v4l2-ctl --list-devices
@@ -71,20 +71,20 @@ Once you have calibrated a camera and detected its port, launch the node.
 roslaunch fake_gps fake_gps.launch upcam_id:=<upcam_id> cam_port:=<cam_port> calib_file:=<path_calibration_file>
 ```
 
-A node must be launched per camera. Multiple nodes can be launched at the same time with little lattency impact. Just calibrate every camera, detect its port and assign it an upcam_id and pass its calibration file. 
+A node must be launched per camera. Multiple nodes can be launched at the same time with little latency impact. Just calibrate every camera, detect its port, and assign it an upcam_id and pass its calibration file. 
 
 
 ## Workshops
-In Q1 2023, the CIMAT Zacatecas community has provided 3 workshops. Undergraduate students, graduate students, teachers and entrepreuners from aorund Mexico have taken the workshop in Zacatecas (city).
+In Q1 2023, the CIMAT Zacatecas community has provided 3 workshops. Undergraduate students, graduate students, teachers, and entrepreneurs from around Mexico have taken the workshop in Zacatecas (city).
 ![Workshops](/docs/images/workshop_poster.png)
 
 
 ## Stay tuned
-Occasionally visit this repo, documentation is constantly in change and great news will come :wink:. Follow [Tsanda Labs](https://www.youtube.com/@tsandalabs9057/) on youtube or at least watch its videos. Videos are being producing in this moment. Also, visit this [website](https://mcr.cimat.mx/es/TallerROS) if you want to enroll to the next workshop.
+Occasionally visit this repo, documentation is constantly in change and great news will come :wink:. Follow [Tsanda Labs](https://www.youtube.com/@tsandalabs9057/) on YouTube or at least watch its videos. Videos are being producing in this moment. Also, visit this [website](https://mcr.cimat.mx/es/TallerROS) if you want to enroll to the next workshop.
 
 
-### Maintance
-So far, @L4rralde or Emmanuel Larralde-Ortiz is the developer and the only one responsible to assure the quality of the whole software stack. Don't hesitate to reach him for any kind of concern, support, collaboration or so.
+### Maintenance
+So far, [@L4rralde](https://github.com/L4rralde) or Emmanuel Larralde-Ortiz is the developer and the only one responsible to assure the quality of the whole software stack. Do not hesitate to reach him for any kind of concern, support, collaboration or so.
 
 
 ### Contact
