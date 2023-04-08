@@ -2,7 +2,10 @@
 ### Abstract
 *DonkieTown* is an affordable and scalable platform for research on autonomous vehicles. The experimental framework was developed in [ROS](https://www.ros.org/). The platform integrates multiple small scale autonomous vehicles called *Asinus Cars*, which are equipped with at least a camera, odometer, and onboard computer. The vehicles are Differential Drive Robots (DDR), forced by software to behave as car-like vehicles. DonkieTown incorporates a low-cost localization system to provide the real-time vehicles' pose, by means of external cameras which detect ArUco markers, then Kalman Filters (KF) are used to track and estimate the pose of each vehicle. The platform includes a base station computer with a graphical interface for monitoring the system. DonkieTown also includes a series of algorithms to facilitate autonomous driving, such as communication, tracking, object detection, obstacle avoidance, control, trajectory tracking, etc. Moreover, a centralized vehicular network is implemented to allow communication between the agents and the base station, where the agents can share information about their state, obstacles, maneuver intentions, etc.
 
-![DonkieTown status](/docs/gifs/platoon.gif)
+<div align="center">
+<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/gifs/platoon.gif" width="600"/>
+</div>
+
 
 #### [Future] Cite and contribute
 All developed source code, libraries and manufacturing files are released as open source under no license agreements. We expect every DonkieTown user to attribute our effort by citing *DonkieTown*.
