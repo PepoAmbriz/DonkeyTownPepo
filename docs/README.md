@@ -1,5 +1,5 @@
 <div align="center">
-<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/images/AsinusCar.jpg" width="200"/>
+<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/images/AsinusCar.jpg" width="300"/>
 
 # DonkieTown: a Low-cost Experimental Testbed for Research on Autonomous Cars
 </div>
