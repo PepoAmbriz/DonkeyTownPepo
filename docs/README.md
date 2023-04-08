@@ -6,8 +6,7 @@
 <img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/gifs/platoon.gif" width="600"/>
 </div>
 
-
-#### [Future] Cite and contribute
+### [Future] Cite and contribute
 All developed source code, libraries and manufacturing files are released as open source under no license agreements. We expect every DonkieTown user to attribute our effort by citing *DonkieTown*.
 
 ```bibtex
@@ -16,11 +15,17 @@ All developed source code, libraries and manufacturing files are released as ope
 }
 ```
 
-To contribute, you are free to create, manage and maintain side branches. By the moment direct git pushes to main branch and any forced git push are not allowed, however, you may submit GitHub pull requests and the [maintenance team](Maintenance) will review them and decide whether to merge it or not.
+To contribute, you are free to create, manage and maintain side branches. By the moment direct git pushes to main branch and any forced git push are not allowed, however, you may submit GitHub pull requests and the maintenance team[^1] will review them and decide whether to merge it or not.
+[^1]: @github/L4rralde or Emmanuel Larralde-Ortiz is the responsible to assure the quality of the whole software stack. Don't hesitate to reach him for any kind of concern, support, collaboration or so.
+
+&nbsp;
 
 
 ## Installation & Set-up
 If you have not installed and set up DonkieTown, visit [the installation page](/docs/INSTALL.md) for directions. You must get it done before using DonkieTown. Once it is done, you may be able to start launching Simulator nodes, Navigation nodes, Localization Nodes, and Vehicular Communication Nodes. 
+
+&nbsp;
+
 
 ## Getting started.
 ### Primary ROS Nodes and ROS Launches
@@ -34,7 +39,10 @@ You can launch one scenario, e.g. in-house navigation, with the following comman
 ```shell
 roslaunch bring_up navigation_inhouse.launch
 ```
-![Simulator](/docs/gifs/simulation.gif)
+
+<div align="center">
+<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/gifs/simulation.gif" width="600"/>
+</div>
 
 #### Asinus Car's *Core* node
 Core node is the essential node of the Asinus Cars. This node enables ROS topics to enable the motors, odometry and an Extended Kalman Filter. If you only want to control the Asinus Car, this node is the go. Also, alongside fake_gps node(s), you get an estimation of the robot's absolute position within the road.
@@ -76,26 +84,28 @@ roslaunch fake_gps fake_gps.launch upcam_id:=<upcam_id> cam_port:=<cam_port> cal
 
 A node must be launched per camera. Multiple nodes can be launched at the same time with little latency impact. Just calibrate every camera, detect its port, and assign it an upcam_id and pass its calibration file. 
 
+&nbsp;
+
 
 ## Workshops
 In Q1 2023, the CIMAT Zacatecas community has provided 3 workshops. Undergraduate students, graduate students, teachers, and entrepreneurs from around Mexico have taken the workshop in Zacatecas (city).
 ![Workshops](/docs/images/workshop_poster.png)
 
+&nbsp;
+
 
 ## Stay tuned
 Occasionally visit this repo, documentation is constantly in change and great news will come :wink:. Follow [Tsanda Labs](https://www.youtube.com/@tsandalabs9057/) on YouTube or at least watch its videos. Videos are being producing in this moment. Also, visit this [website](https://mcr.cimat.mx/es/TallerROS) if you want to enroll to the next workshop.
 
-
-### Maintenance
-So far, [@L4rralde](https://github.com/L4rralde) or Emmanuel Larralde-Ortiz is the developer and the only one responsible to assure the quality of the whole software stack. Do not hesitate to reach him for any kind of concern, support, collaboration or so.
+&nbsp;
 
 
-### Contact
-> Emmanuel Larralde-Ortiz
-- ealarralde@gmail.com
-> Alberto Luviano-Juárez
-- aluvianoj@ipn.mx
-> Diego Mercado-Ravell
-- diego.mercado@cimat.mx
-> Flabio Mirelez-Delgado
-- fmirelezd@ipn.mx
+## Contact
+- Emmanuel Larralde-Ortiz
+   - ealarralde@gmail.com
+- Alberto Luviano-Juárez
+   - aluvianoj@ipn.mx
+- Diego Mercado-Ravell
+   - diego.mercado@cimat.mx
+- Flabio Mirelez-Delgado
+   - fmirelezd@ipn.mx
