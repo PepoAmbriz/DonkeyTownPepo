@@ -66,6 +66,7 @@ sudo sh -c "echo 'source ~/DonkieTown/bs_setup.bash' >> ~/.bashrc"
 
 For any issue contact the [maintanance team](Maintenance).
 
+
 ### Maintenance
 @L4rralde or Emmanuel Larralde-Ortiz is the responsible to assure the quality of the whole software stack. Don't hesitate to reach him for any kind of concern, support, collaboration or so.
 
