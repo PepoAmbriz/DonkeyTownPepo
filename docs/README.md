@@ -1,4 +1,9 @@
+<div align="center">
+<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/images/AsinusCar.jpg" width="200"/>
+
 # DonkieTown: a Low-cost Experimental Testbed for Research on Autonomous Cars
+</div>
+
 ### Abstract
 *DonkieTown* is an affordable and scalable platform for research on autonomous vehicles. The experimental framework was developed in [ROS](https://www.ros.org/). The platform integrates multiple small scale autonomous vehicles called *Asinus Cars*, which are equipped with at least a camera, odometer, and onboard computer. The vehicles are Differential Drive Robots (DDR), forced by software to behave as car-like vehicles. DonkieTown incorporates a low-cost localization system to provide the real-time vehicles' pose, by means of external cameras which detect ArUco markers, then Kalman Filters (KF) are used to track and estimate the pose of each vehicle. The platform includes a base station computer with a graphical interface for monitoring the system. DonkieTown also includes a series of algorithms to facilitate autonomous driving, such as communication, tracking, object detection, obstacle avoidance, control, trajectory tracking, etc. Moreover, a centralized vehicular network is implemented to allow communication between the agents and the base station, where the agents can share information about their state, obstacles, maneuver intentions, etc.
 
@@ -16,7 +21,7 @@ All developed source code, libraries and manufacturing files are released as ope
 ```
 
 To contribute, you are free to create, manage and maintain side branches. By the moment direct git pushes to main branch and any forced git push are not allowed, however, you may submit GitHub pull requests and the maintenance team[^1] will review them and decide whether to merge it or not.
-[^1]: @github/L4rralde or Emmanuel Larralde-Ortiz is the responsible to assure the quality of the whole software stack. Don't hesitate to reach him for any kind of concern, support, collaboration or so.
+[^1]: [@L4rralde](https://github.com/L4rralde) or Emmanuel Larralde-Ortiz is the responsible to assure the quality of the whole software stack. Don't hesitate to reach him for any kind of concern, support, collaboration or so.
 
 &nbsp;
 
@@ -89,7 +94,10 @@ A node must be launched per camera. Multiple nodes can be launched at the same t
 
 ## Workshops
 In Q1 2023, the CIMAT Zacatecas community has provided 3 workshops. Undergraduate students, graduate students, teachers, and entrepreneurs from around Mexico have taken the workshop in Zacatecas (city).
-![Workshops](/docs/images/workshop_poster.png)
+
+<div align="center">
+<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/images/workshop_poster.png" width="800"/>
+</div>
 
 &nbsp;
 
