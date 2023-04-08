@@ -1,11 +1,73 @@
-# DonkieTown
-## A low-cost experimental platform for research on Intelligent Vehicles. 
+<div align="center">
+<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/images/AsinusCar.jpg" width="400"/>
 
-DonkieTown consists of one or more differential-drive robots called Asinus cars, a ground station, a localization system and a series of trusted techniques that easily allow the development of testbeds to implement and validate different strategies for collaborative autonomous driving, and study a variety of cases of study.
+# Installing software for Asinus Cars 
+</div>
+
+&nbsp;
+
 
 ## Instructions
+The NVIDIA Jetson Nano Developer Kit is the onboard computer of the Asinus Cars. Therefore, the following instructions apply only for that Single-Board computer.
+
 ### 1. FLash Jetpack
 - Flash Jetpack 4.5 on 64GB pendrive with balena etcher or flash jetbot 0.4.3 image as described in https://jetbot.org/master/software_setup/sd_card.html
+
+### Setting static ip for wlan
+This procedure has been proved for asinus cars and ours upper cameras. 
+1. Install netplan.
+```
+sudo apt-get install netplan.io
+```
+2. Identify your wireless network interface name.
+```
+ls /sys/class/net
+```
+Take a note of this interface name (wlan0). We will use it in next steps. 
+
+3. Add netplan file from main branch of DonkieTown repo.
+```
+sudo cp ./misc/50-cloud-init.yaml /etc/netplan/50-cloud-init.yaml
+``` 
+4. Generate the configuration.
+```
+sudo netplan generate
+```
+5. Apply the changes.
+```
+sudo netplan apply
+```
+
+### Changing login credentials.
+Change the password is as easy as type:
+```
+passwd
+```
+However, changing username is not as easy (but you could set your crdentials since the first boot).
+1. Create a temp user.
+```
+sudo -s
+useradd -G sudo temp
+passwd temp
+shutdown -h now
+```
+2. Log back in as the new "temp" user and elevate "temp" privileges.
+```
+ssh temp@192.168.100...
+sudo -s
+```
+3. Now, change username of the main account.
+```
+usermod -l donkietown <previous_user_name>
+shutdown -h now
+```
+4. Log back in as the donkietown user and delete out the temp user.
+```
+ssh donkietown@192.168.100...
+sudo -s
+deluser temp
+rm -rf /home/temp
+```
 
 ### 2. Install ROS
 - Install ros melodic and ros packages for jetson_nano as described in https://github.com/dusty-nv/jetbot_ros/tree/melodic 
@@ -71,7 +133,7 @@ sudo sh -c "echo 'source ~/ros_deep_learning/catkin_ws/devel/setup.bash' >> ~/.b
 
 - [OPTIONAL] Build source of openCV 4.5.0 for jetson nano with cuda enabled as described in: https://qengineering.eu/install-opencv-4.5-on-jetson-nano.html
 
-- [OPTIONAL] Install scipy for python2:
+- Install scipy for python2:
 ```
 python -m pip install --upgrade pip
 python -m pip install scipy
@@ -108,16 +170,8 @@ Source ag_setup.bash file
 sudo sh -c "echo 'source <DT_PATH>/ag_setup.bash' >> ~/.bashrc"
 ```
 
-### Deprecated
-- [DEPRECATED] Install filterpy with pip
-```
-pip install filterpy
-```
-- [DEPRECATED] Install filterpy from source
-```
-git clone http://github.com/rlabbe/filterpy
-python setup.py install
-```
+&nbsp;
+
 
 ## Troubleshooting
 - Project 'cv_bridge' can not find opencv
