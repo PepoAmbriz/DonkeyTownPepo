@@ -61,6 +61,10 @@ In addition to *Core* features, *Prime* enables *DonkieNet* (a MobileNet+SSD det
 roslaunch asinus_car prime.launch car_id:=<marker_id>
 ```
 
+<div align="center">
+<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/gifs/donkienet.gif" width="600"/>
+</div>
+
 #### Vehicular communication node [Base Station only]
 The following starts message handling and post-processing of shared data of pedestrians detected by all Asinus Cars.
 ```shell
