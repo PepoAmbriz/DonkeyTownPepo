@@ -4,8 +4,8 @@
 # DonkieTown: a Low-cost Experimental Testbed for Research on Autonomous Cars
 </div>
 
-<a href="https://www.youtube.com/@tsandalabs9057/featured"><img align="left" src="https://github.com/L4rralde/DonkieTown/blob/main/docs/images/youtube-logo.png" alt="icon | TsandaLabs" height="16px"/></a>
-<a href="https://forums.developer.nvidia.com/t/donkietown-a-low-cost-experimental-platform-for-research-on-automated-and-conected-vehicles/242486"><img align="left" src="https://github.com/L4rralde/DonkieTown/blob/main/docs/images/nvidia-logo.png" alt="icon | Nvidia" height="16px"/></a>
+<a href="https://www.youtube.com/@tsandalabs9057/featured"><img align="left" src="https://github.com/L4rralde/DonkieTown/blob/main/docs/images/youtube-logo.png" alt="icon | TsandaLabs" height="14px"/></a>
+<a href="https://forums.developer.nvidia.com/t/donkietown-a-low-cost-experimental-platform-for-research-on-automated-and-conected-vehicles/242486"><img align="left" src="https://github.com/L4rralde/DonkieTown/blob/main/docs/images/nvidia-logo.png" alt="icon | Nvidia" height="14px"/></a>
 <br>
 
 ### Abstract
