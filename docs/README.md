@@ -66,7 +66,7 @@ roslaunch asinus_car prime.launch car_id:=<marker_id>
 ```
 
 <div align="center">
-<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/gifs/donkienet.gif" width="600"/>
+<img src="https://github.com/L4rralde/DonkieTown/blob/main/docs/gifs/donkienet2.gif" width="600"/>
 </div>
 
 #### Vehicular communication node [Base Station only]
