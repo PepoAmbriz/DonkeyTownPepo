@@ -53,7 +53,7 @@ class VectorfieldController(MapConfig):
         self.last_var = [0.0]
             
         self.model_car = get_AutoModel(model_car,callbacks=callbacks,
-					fake_gps=True, car_id=car_id)
+					fake_gps=False, car_id=car_id)
         
         self.x = 0.0
         self.y = 0.0 
@@ -274,7 +274,7 @@ def main():
     map_name = rospy.get_param("~map_name","cimat_reduced")
     lane = int(rospy.get_param("~lane",'1'))
     look_ahead = rospy.get_param("~look_ahead","30cm")
-    model_car = rospy.get_param("~model_car","AsinusCar")
+    model_car = rospy.get_param("~model_car","AutoModelMini")
     car_id = int(rospy.get_param("~car_id","7"))
     speed = float(rospy.get_param("~speed","0.2"))
     try:

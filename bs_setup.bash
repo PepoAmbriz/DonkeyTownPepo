@@ -4,4 +4,4 @@ DT_IP=$(expr 100 + $DT_ID)
 source $DT_PATH/ros_station_nodes/catkin_ws/devel/setup.bash
 export GAZEBO_MODEL_PATH=$DT_PATH/ros_station_nodes/catkin_ws/src/simulator/models	
 source $DT_PATH/ros_base_nodes/catkin_ws/devel/setup.bash
-export ROS_HOSTNAME=192.168.100.$DT_IP
+#export ROS_HOSTNAME=192.168.100.$DT_IP
