@@ -10,7 +10,7 @@ import cv2
 #map_size_y = 430  # cm
 #map_size_x = 596  # cm
 #map_size_y = 596  # cm
-mname = 'new_indoors'
+mname = 'cimat_actual'
 img = cv2.imread('./maps/'+mname+'/map.png')
 (h,w,l) = img.shape
 print(h)

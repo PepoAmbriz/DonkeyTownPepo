@@ -57,7 +57,7 @@ def save(csv_name,lane,map_name):
 
 def main():
     
-    mname = "new_indoors"
+    mname = "cimat_actual"
     save("./maps/"+mname+"/new_map_loop1.txt",lane='lane1',map_name=mname)
     plt.show()
     save("./maps/"+mname+"/new_map_loop2.txt",lane='lane2',map_name=mname)

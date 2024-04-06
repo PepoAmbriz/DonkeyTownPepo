@@ -8,7 +8,7 @@
       <visual name='visual'>
         <geometry>
           <box>
-            <size>6.0 6.0 1e-04</size>
+            <size>8.0 6.0 1e-04</size>
           </box>
         </geometry>
         <material>
@@ -46,7 +46,7 @@
       <visual name='visual'>
         <geometry>
           <box>
-            <size>4.0 7.0 1e-04</size>
+            <size>8.0 6.0 1e-04</size>
           </box>
         </geometry>
         <material>

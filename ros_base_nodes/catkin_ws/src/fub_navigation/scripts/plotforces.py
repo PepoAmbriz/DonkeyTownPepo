@@ -5,7 +5,7 @@ from scipy.spatial import KDTree
 import cv2
 
 
-mname = 'new_indoors'
+mname = 'cimat_actual'
 img = cv2.imread('./maps/'+mname+'/map.png')
 (h,w,l) = img.shape
 print(h)

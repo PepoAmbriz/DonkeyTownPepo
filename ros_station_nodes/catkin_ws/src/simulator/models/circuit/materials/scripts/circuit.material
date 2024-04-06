@@ -7,7 +7,7 @@ material Circuit/Mat
     {
       texture_unit
       {
-        texture cimat_reduced.png
+        texture cimat_actual.jpeg
       }
     }
   }

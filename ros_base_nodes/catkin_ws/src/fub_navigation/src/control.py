@@ -271,9 +271,9 @@ def get_coords_from_vf(raw_x, raw_y, resolution, map_size_x, map_size_y, matrix)
 
 def main():
     rospy.init_node('VectorfieldController')
-    map_name = rospy.get_param("~map_name","cimat_reduced")
-    lane = int(rospy.get_param("~lane",'1'))
-    look_ahead = rospy.get_param("~look_ahead","30cm")
+    map_name = rospy.get_param("~map_name","cimat_actual")
+    lane = int(rospy.get_param("~lane",'2'))
+    look_ahead = rospy.get_param("~look_ahead","50cm")
     model_car = rospy.get_param("~model_car","AutoModelMini")
     car_id = int(rospy.get_param("~car_id","7"))
     speed = float(rospy.get_param("~speed","0.2"))
