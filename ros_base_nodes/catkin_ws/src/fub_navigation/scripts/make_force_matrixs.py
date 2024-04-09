@@ -10,7 +10,7 @@ import cv2
 #map_size_y = 430  # cm
 #map_size_x = 596  # cm
 #map_size_y = 596  # cm
-mname = 'cimat_actual'
+mname = 'tmr2024'
 img = cv2.imread('./maps/'+mname+'/map.png')
 (h,w,l) = img.shape
 print(h)
@@ -33,9 +33,9 @@ def main(map_name, lane, la_o):
     tree = KDTree(xy)
 
     #fig = plt.figure(figsize=(12, 10), facecolor='w')
-    plt.plot(x, y, ':o', markersize=2)
+    #plt.plot(x, y, ':o', markersize=2)
 
-    plt.tight_layout()
+    #plt.tight_layout()
 
     def show_nearest(target):
         dist, index = tree.query(target)
